@@ -1,8 +1,12 @@
-from flask import Flask, Response
-from slackeventsapi import SlackEventAdapter
+import json
 import os
+import requests
+
+from flask import Flask, Response, jsonify, request
+from slackeventsapi import SlackEventAdapter
 from threading import Thread
 from slack import WebClient
+
 
 
 # This `app` represents your existing Flask app
@@ -12,7 +16,7 @@ greetings = ["hi", "hello", "hello there", "hey"]
 
 SLACK_SIGNING_SECRET = os.environ['SLACK_SIGNING_SECRET']
 slack_token = os.environ['SLACK_BOT_TOKEN']
-VERIFICATION_TOKEN = os.environ['VERIFICATION_TOKEN']
+SLACK_VERIFICATION_TOKEN = os.environ['SLACK_VERIFICATION_TOKEN']
 
 #instantiating slack client
 slack_client = WebClient(slack_token)
@@ -21,7 +25,7 @@ slack_client = WebClient(slack_token)
 @app.route("/")
 def event_hook(request):
     json_dict = json.loads(request.body.decode("utf-8"))
-    if json_dict["token"] != VERIFICATION_TOKEN:
+    if json_dict["token"] != SLACK_VERIFICATION_TOKEN:
         return {"status": 403}
 
     if "type" in json_dict:
@@ -31,6 +35,45 @@ def event_hook(request):
     return {"status": 500}
     return
 
+
+# An example of one of your Flask app's routes
+@app.route("/slack/command", methods=['POST'])
+def command_hook():
+    def post_command(form):
+        print("command_hook")
+        print(form)
+        message = {
+            # Uncomment the line below for the response to be visible to everyone
+            'response_type': 'in_channel',
+            'text': 'More fleshed out response to the slash command',
+            'attachments': [
+                {
+                    'fallback': 'Required plain-text summary of the attachment.',
+                    'color': '#36a64f',
+                    'pretext': 'Optional text above the attachment block',
+                    'author_name': 'Bobby Tables',
+                    'author_link': 'http://flickr.com/bobby/',
+                    'author_icon': 'http://flickr.com/icons/bobby.jpg',
+                    'title': 'Slack API Documentation',
+                    'title_link': 'https://api.slack.com/',
+                    'text': 'Optional text that appears within the attachment',
+                    'fields': [
+                        {
+                            'title': 'Priority',
+                            'value': 'High',
+                            'short': False
+                        }
+                    ],
+                    'image_url': 'http://my-website.com/path/to/image.jpg',
+                    'thumb_url': 'http://example.com/path/to/thumb.png'
+                }
+            ]
+        }
+        requests.post(url=form.get('response_url'), json=message)
+        return
+    thread = Thread(target=post_command, kwargs={"form": request.form})
+    thread.start()
+    return Response(status=200)
 
 slack_events_adapter = SlackEventAdapter(
     SLACK_SIGNING_SECRET, "/slack/events", app
