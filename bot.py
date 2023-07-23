@@ -1,11 +1,13 @@
 import json
 import os
 import requests
+import time
 
 from flask import Flask, Response, jsonify, request
 from slackeventsapi import SlackEventAdapter
 from threading import Thread
 from slack import WebClient
+from flask_slacksigauth import slack_sig_auth
 
 
 
@@ -14,6 +16,7 @@ app = Flask(__name__)
 
 greetings = ["hi", "hello", "hello there", "hey"]
 
+app.config['SLACK_SIGNING_SECRET'] = os.environ['SLACK_SIGNING_SECRET']
 SLACK_SIGNING_SECRET = os.environ['SLACK_SIGNING_SECRET']
 slack_token = os.environ['SLACK_BOT_TOKEN']
 SLACK_VERIFICATION_TOKEN = os.environ['SLACK_VERIFICATION_TOKEN']
@@ -23,8 +26,8 @@ slack_client = WebClient(slack_token)
 
 # An example of one of your Flask app's routes
 @app.route("/")
-def event_hook(request):
-    json_dict = json.loads(request.body.decode("utf-8"))
+def event_hook(received_request):
+    json_dict = json.loads(received_request.body.decode("utf-8"))
     if json_dict["token"] != SLACK_VERIFICATION_TOKEN:
         return {"status": 403}
 
@@ -37,7 +40,16 @@ def event_hook(request):
 
 
 # An example of one of your Flask app's routes
+@app.route("/slack/interaction", methods=['POST'])
+@slack_sig_auth
+def interaction_hook():
+    print(request.headers)
+    print(request.form)
+    return Response(status=200)
+
+# An example of one of your Flask app's routes
 @app.route("/slack/command", methods=['POST'])
+@slack_sig_auth
 def command_hook():
     def post_command(form):
         print("command_hook")
@@ -71,6 +83,8 @@ def command_hook():
         }
         requests.post(url=form.get('response_url'), json=message)
         return
+    if request.form.get('response_url') != SLACK_VERIFICATION_TOKEN:
+        return {"status": 403}
     thread = Thread(target=post_command, kwargs={"form": request.form})
     thread.start()
     return Response(status=200)
