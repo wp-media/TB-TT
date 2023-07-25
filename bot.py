@@ -2,7 +2,11 @@ import json
 import os
 import requests
 import time
+import jwt
+import gql
 
+from gql.transport.requests import RequestsHTTPTransport
+from pathlib import Path
 from flask import Flask, Response, jsonify, request
 from slackeventsapi import SlackEventAdapter
 from threading import Thread
@@ -16,13 +20,20 @@ app = Flask(__name__)
 
 greetings = ["hi", "hello", "hello there", "hey"]
 
-app.config['SLACK_SIGNING_SECRET'] = os.environ['SLACK_SIGNING_SECRET']
-SLACK_SIGNING_SECRET = os.environ['SLACK_SIGNING_SECRET']
-slack_token = os.environ['SLACK_BOT_TOKEN']
-SLACK_VERIFICATION_TOKEN = os.environ['SLACK_VERIFICATION_TOKEN']
+
+# Your GitHub access token from JSON file
+file = open(Path(__file__).parent / "config" / "keys" / "tokens.json", encoding='utf-8')
+file_token_data = json.load(file)
+GITHUB_ACCESS_TOKEN = file_token_data["github_token"]
+GITHUB_APP_ID = file_token_data["github_app_id"]
+SLACK_SIGNING_SECRET = file_token_data["slack_signing_secret"]
+app.config['SLACK_SIGNING_SECRET'] = SLACK_SIGNING_SECRET
+SLACK_VERIFICATION_TOKEN = file_token_data["slack_verification_token"]
+SLACK_BOT_USER_TOKEN = file_token_data["slack_bot_user_token"]
+
 
 #instantiating slack client
-slack_client = WebClient(slack_token)
+slack_client = WebClient(SLACK_BOT_USER_TOKEN)
 
 # An example of one of your Flask app's routes
 @app.route("/")
@@ -50,7 +61,56 @@ def interaction_hook():
     interaction_type = payload_json['type']
 
     if 'view_submission' == interaction_type:
-        print('yeah')
+        print('See this page to connect to Github: https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation')
+        """ Authentication as a GitHub app works but no visibility over the projectV2 is granted.
+        #Generate JWT
+        pem_path = Path(__file__).parent / "config/keys/techteambot.2023-07-23.private-key.pem"
+        with open(pem_path, 'rb') as pem_file:
+            signing_key = jwt.jwk_from_pem(pem_file.read())
+            payload = {
+            # Issued at time
+            'iat': int(time.time()),
+            # JWT expiration time (10 minutes maximum)
+            'exp': int(time.time()) + 600,
+            # GitHub App's identifier
+            'iss': GITHUB_APP_ID
+            }
+            # Create JWT
+            jwt_instance = jwt.JWT()
+            encoded_jwt = jwt_instance.encode(payload, signing_key, alg='RS256')
+            print(f"JWT:  {encoded_jwt}")
+
+            #Retrieve access token
+            url = 'https://api.github.com/app/installations/39984386/access_tokens'
+            headers = {'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28', 'Authorization': 'Bearer ' + encoded_jwt}
+            token_response = requests.post(url, headers=headers)
+            token_response_payload = token_response.json()
+            access_token = token_response_payload['token']
+            print(f"access_token:  {access_token}")
+        """
+        #Create task
+        # GitHub API endpoint
+
+        url = 'https://api.github.com/graphql'
+        # Set up the HTTP transport and add authentication header
+        transport = RequestsHTTPTransport(
+            url=url, headers={'Authorization': f'Bearer {GITHUB_ACCESS_TOKEN}'})
+        # Create a GraphQL client
+        client = gql.Client(transport=transport, fetch_schema_from_transport=True)
+        query = gql.gql(
+            """
+            mutation CreateProjectV2Task($task: AddProjectV2DraftIssueInput!) {
+                addProjectV2DraftIssue(input: $task) {
+                    clientMutationId
+                }
+            }
+        """
+        )
+        params = {
+            "task": {"body": 'This is the body', "title": "This is the title", "clientMutationId":'my_key', 'projectId':'PVT_kwHOAOhwBs4ANXSV' },
+        }
+        result = client.execute(query, variable_values=params)
+        print(result)
         return {"response_action": "clear"}
     elif 'shortcut' == interaction_type:
         callback = payload_json['callback_id']
@@ -111,7 +171,7 @@ def interaction_hook():
                     }'''
 
             request_open_view_payload = dict()
-            request_open_view_header = {"Authorization": "Bearer " + os.environ['SLACK_BOT_TOKEN']}
+            request_open_view_header = {"Authorization": "Bearer " + SLACK_BOT_USER_TOKEN}
             request_open_view_payload['view'] = view
             request_open_view_payload['trigger_id'] = payload_json['trigger_id']
             response = requests.post(url='https://slack.com/api/views.open', headers=request_open_view_header, json=request_open_view_payload, timeout=3000)

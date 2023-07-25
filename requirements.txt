@@ -48,3 +48,4 @@ Werkzeug==2.3.6
 wrapt==1.15.0
 yarl==1.9.2
 flask-slacksigauth==1.0.9
+jwt==1.3.1
