@@ -40,6 +40,7 @@ class SlackModalFactory():
             "blocks": [
                 {
                     "type": "input",
+                    "block_id": "title_block",
                     "label": {
                         "type": "plain_text",
                         "text": "Title of the task"
@@ -57,6 +58,7 @@ class SlackModalFactory():
                 },
                 {
                     "type": "input",
+                    "block_id": "description_block",
                     "label": {
                         "type": "plain_text",
                         "text": "Description of the task"
@@ -71,6 +73,108 @@ class SlackModalFactory():
                         "multiline": true
                     },
                     "optional": false
+                },
+                {
+                    "type": "input",
+                    "block_id": "immediately_block",
+                    "element": {
+                        "type": "checkboxes",
+                        "options": [
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "The task must be handled immediately.",
+                                    "emoji": true
+                                },
+                                "value": "handle_immediately"
+                            }
+                        ],
+                    },
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Immediate escalation",
+                    },
+                    "optional": true
+                },
+                {
+                    "type": "section",
+                    "block_id": "assignee_block",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Select a engineering teammate:"
+                    },
+                    "accessory": {
+                        "type": "static_select",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Assign the task to a teammate."
+                        },
+                        "options": [
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "No assignee"
+                                },
+                                "value": "no-assignee"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Ahmed Saeed"
+                                },
+                                "value": "engahmeds3ed"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Rémy Perona"
+                                },
+                                "value": "Tabrisrp"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Mostafa Hisham"
+                                },
+                                "value": "mostafa-hisham"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Nicolas Mollet"
+                                },
+                                "value": "nicomollet"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Cyrille Coquard"
+                                },
+                                "value": "CrochetFeve0251"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "John Gathure"
+                                },
+                                "value": "johngathure"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Michael Lee"
+                                },
+                                "value": "jeawhanlee"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Mathieu Lamiot"
+                                },
+                                "value": "MathieuLamiot"
+                            }
+                        ]
+                    }
                 }
             ],
             "close": {

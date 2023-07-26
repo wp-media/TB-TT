@@ -51,10 +51,24 @@ class SlackViewSubmissionHandler():
         """
         task_params = {}
         modal_values = payload_json["view"]["state"]["values"]
-        for key in modal_values:
-            for item_key in modal_values[key]:
-                if 'task_title' == item_key:
-                    task_params['title'] = modal_values[key][item_key]['value']
-                elif 'task_description' == item_key:
-                    task_params['body'] = modal_values[key][item_key]['value']
+
+        # Title component
+        task_params['title'] = modal_values['title_block']['task_title']['value']
+
+        # Description component
+        task_params['body'] = modal_values['description_block']['task_description']['value']
+
+        # Immediate component
+        keys = list(dict.keys(modal_values['immediately_block']))
+        selected_options = modal_values['immediately_block'][keys[0]]['selected_options']
+        for selected_option in selected_options:
+            if 'handle_immediately' == selected_option['value']:
+                task_params['handle_immediately'] = True
+
+        # Assignee component
+        keys = list(dict.keys(modal_values['assignee_block']))
+        selected_option = modal_values['assignee_block'][keys[0]]['selected_option']
+        if selected_option is not None:
+            task_params['assignee'] = selected_option['value']
+
         return task_params
