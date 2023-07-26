@@ -1,5 +1,5 @@
-# TechTeamBot
-This app is a helper bot template for Tech teams, leveraging Slack and github integartions for better agile workflows.
+# TB-TT
+This app is a helper bot  for the Engineering team at WP Media, leveraging Slack and github integartions for better agile workflows.
 
 ## Configuration
 To run the app, you must first configure it with Slack and Github information, including credentials.
