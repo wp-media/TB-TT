@@ -1,0 +1,8 @@
+[MASTER]
+init-hook="from pylint.config import find_pylintrc; import os, sys; sys.path.append(os.path.dirname(find_pylintrc())); sys.path.append(os.path.join(os.path.dirname(find_pylintrc()), 'src'))"
+[FORMAT]
+max-line-length=127
+module-naming-style=PascalCase
+const-naming-style=UPPER_CASE
+[MESSAGES CONTROL]
+disable=too-few-public-methods

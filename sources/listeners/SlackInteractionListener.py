@@ -1,24 +1,36 @@
+"""
+    This module defines the endpoint handler (called listener) for the Slack Interaction endpoint.
+"""
+
 import json
 
-
 from flask_slacksigauth import slack_sig_auth
-from flask import Response, request
-
+from flask import request
 from sources.handlers.SlackShortcutHandler import SlackShortcutHandler
 from sources.handlers.SlackViewSubmissionHandler import SlackViewSubmissionHandler
 
-class SlackInteractionListener():
 
-    slack_shortcut_handler = None
-    slack_view_submission_handler = None
+class SlackInteractionListener():
+    """
+        Class to define the Slack Interaction endpoint handler. It is callable and called when the right url is used.
+    """
 
     def __init__(self):
+        """
+            The listener instanciates the handlers it will pass the request to so that it is processed.
+        """
         self.slack_shortcut_handler = SlackShortcutHandler()
         self.slack_view_submission_handler = SlackViewSubmissionHandler()
-        return
 
     @slack_sig_auth
     def __call__(self):
+        """
+            Method called to process a request on the registered endpoint.
+            It is subject to signed authentication.
+            The method extracts the payload and route it to the correct handler.
+            This method catches errors and manages their mapping to HTTP error codes.
+        """
+
         # Retrieve the payload of the POST request
         payload_json = json.loads(request.form.get('payload'))
 
@@ -38,6 +50,7 @@ class SlackInteractionListener():
             return str(error), 500
         except NotImplementedError as error:
             return str(error), 501
+        # pylint: disable-next=broad-exception-caught
         except Exception as error:
             return str(error), 500
         return response_payload, 200
