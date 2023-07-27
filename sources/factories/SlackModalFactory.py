@@ -28,7 +28,7 @@ class SlackModalFactory():
             self.__slack_bot_user_token = current_app.config[cst.APP_CONFIG_TOKEN_SLACK_BOT_USER_TOKEN]
         return self.__slack_bot_user_token
 
-    def ___get_assignee_list(self):
+    def __get_assignee_list(self):
         """
             Generate the list of options for the drop-down select of assignee, from thegithub.json config file.
         """
@@ -43,6 +43,7 @@ class SlackModalFactory():
                                         })
             with open(Path(__file__).parent.parent.parent / "config" / "github.json", encoding='utf-8') as file_github_config:
                 github_config = json.load(file_github_config)
+            if "assigneeList" in github_config:
                 for key, value in github_config["assigneeList"].items():
                     self.__assignee_list.append({
                                                     "text": {
@@ -57,7 +58,7 @@ class SlackModalFactory():
         """
             Method to create and open the Create github task modal on Slack
         """
-        assignee_list = self.___get_assignee_list()
+        assignee_list = self.__get_assignee_list()
         view = '''{
             "type": "modal",
             "title": {
@@ -115,11 +116,11 @@ class SlackModalFactory():
                                 },
                                 "value": "handle_immediately"
                             }
-                        ],
+                        ]
                     },
                     "label": {
                         "type": "plain_text",
-                        "text": "Immediate escalation",
+                        "text": "Immediate escalation"
                     },
                     "optional": true
                 },
@@ -136,7 +137,7 @@ class SlackModalFactory():
                             "type": "plain_text",
                             "text": "Assign the task to a teammate."
                         },
-                        "options": ''' + str(assignee_list) + '''
+                        "options": ''' + json.dumps(assignee_list) + '''
                     }
                 }
             ],

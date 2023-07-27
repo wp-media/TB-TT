@@ -84,7 +84,7 @@ class GithubGQLCallFactory():
                     id
                 }
             }
-        """
+            """
         )
         response = self.__send_gql_request(app_context, query, query_params)
         try:
@@ -159,7 +159,7 @@ class GithubGQLCallFactory():
                 end_date = start_date + timedelta(days=duration)
                 if start_date <= now < end_date:
                     return iteration['id']
-        except TypeError:
+        except KeyError:
             return None
         return None
 
@@ -218,6 +218,6 @@ class GithubGQLCallFactory():
             try:
                 # pylint: disable-next=unsubscriptable-object
                 project_item_id = response['addProjectV2DraftIssue']['projectItem']['id']
-            except TypeError:
+            except KeyError:
                 return
             self.set_task_to_current_sprint(app_context, project_item_id)
