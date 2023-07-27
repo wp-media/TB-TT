@@ -60,6 +60,14 @@ class GithubGQLCallFactory():
             self.__github_gql_client = gql.Client(transport=github_http_transport, fetch_schema_from_transport=True)
         return self.__github_gql_client
 
+    def __send_gql_request(self, app_context, query, params):
+        """
+            This methods handles sending a GQL request to GitHub through the dedicated HTTP Client.
+        """
+        client = self.__get_github_gql_client(app_context)
+        response = client.execute(query, variable_values=params)
+        return response
+
     def get_user_id_from_login(self, app_context, login):
         """
             Returns the GitHub ID of a user from its GitHub login.
@@ -78,8 +86,7 @@ class GithubGQLCallFactory():
             }
         """
         )
-        client = self.__get_github_gql_client(app_context)
-        response = client.execute(query, variable_values=query_params)
+        response = self.__send_gql_request(app_context, query, query_params)
         try:
             # pylint: disable-next=unsubscriptable-object
             result = response['user']['id']
@@ -116,8 +123,7 @@ class GithubGQLCallFactory():
         query_params = {}
         query_params['fieldMutation'] = mutation_param
 
-        client = self.__get_github_gql_client(app_context)
-        client.execute(query, variable_values=query_params)
+        self.__send_gql_request(app_context, query, query_params)
 
     def get_current_sprint_id(self, app_context):
         """
@@ -141,8 +147,8 @@ class GithubGQLCallFactory():
                 """)
         query_params = {}
         query_params['node_id'] = self.github_config['sprintFieldId']
-        client = self.__get_github_gql_client(app_context)
-        response = client.execute(query, variable_values=query_params)
+        response = self.__send_gql_request(app_context, query, query_params)
+
         try:
             # pylint: disable-next=unsubscriptable-object
             duration = response['node']['configuration']['duration']
@@ -206,8 +212,7 @@ class GithubGQLCallFactory():
         query_params = {}
         query_params['task'] = mutation_param
 
-        client = self.__get_github_gql_client(app_context)
-        response = client.execute(query, variable_values=query_params)
+        response = self.__send_gql_request(app_context, query, query_params)
 
         if handle_immediately:
             try:
