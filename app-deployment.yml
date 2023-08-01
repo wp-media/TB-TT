@@ -21,6 +21,22 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 3000
+          env:
+            - name: TBTT_GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: tbtt-secrets
+                  key: TBTT_GITHUB_TOKEN
+            - name: TBTT_SLACK_BOT_USER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: tbtt-secrets
+                  key: TBTT_SLACK_BOT_USER_TOKEN
+            - name: TBTT_SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: tbtt-secrets
+                  key: TBTT_SLACK_SIGNING_SECRET
 
 ---
 apiVersion: v1

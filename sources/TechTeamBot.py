@@ -3,6 +3,7 @@
 """
 
 import json
+import os
 from pathlib import Path
 from sources.FlaskAppWrapper import FlaskAppWrapper
 from sources.listeners.SlackInteractionListener import SlackInteractionListener
@@ -17,24 +18,24 @@ class TechTeamBot(FlaskAppWrapper):
 
     def __init__(self, flask_app):
         FlaskAppWrapper.__init__(self, flask_app)
-        self.__tokens = []
         self.__app_config = None
 
-    def __load_keys(self):
+    def __load_key(self, var_name, key_name):
         """
-            Reads the config/keys/token.json file and store the results in a private attribute.
+            Reads var_name in environment variables and store it as an app.config under key_name.
+            Throws a KeyError if it is not found.
         """
-        with open(Path(__file__).parent.parent / "config" / "keys" / "tokens.json", encoding='utf-8') as file_token:
-            self.__tokens = json.load(file_token)
+        self.app.config[key_name] = os.getenv(var_name)
+        if self.app.config[key_name] is None:
+            raise KeyError(var_name + ' is not found.')
 
     def __setup_keys(self):
         """
             Manages the setup of the keys/token as config of the Flask app
         """
-        self.__load_keys()
-        self.app.config[cst.APP_CONFIG_TOKEN_SLACK_SIGNING_SECRET] = self.__tokens["slack_signing_secret"]
-        self.app.config[cst.APP_CONFIG_TOKEN_SLACK_BOT_USER_TOKEN] = self.__tokens["slack_bot_user_token"]
-        self.app.config[cst.APP_CONFIG_TOKEN_GITHUB_ACCESS_TOKEN] = self.__tokens["github_token"]
+        self.__load_key("TBTT_SLACK_SIGNING_SECRET", cst.APP_CONFIG_TOKEN_SLACK_SIGNING_SECRET)
+        self.__load_key("TBTT_SLACK_BOT_USER_TOKEN", cst.APP_CONFIG_TOKEN_SLACK_BOT_USER_TOKEN)
+        self.__load_key("TBTT_GITHUB_TOKEN", cst.APP_CONFIG_TOKEN_GITHUB_ACCESS_TOKEN)
 
     def __setup_slack_interaction_endpoint(self):
         """
