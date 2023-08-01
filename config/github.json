@@ -1,3 +1,14 @@
 {
-    "projectId": "your_projectId_here"
+    "projectId": "PVT_kwHOAOhwBs4ANXSV",
+    "sprintFieldId": "PVTIF_lAHOAOhwBs4ANXSVzgIlmIQ",
+    "assigneeList": {
+        "Ahmed Saeed": "engahmeds3ed",
+        "Rémy Perona": "Tabrisrp",
+        "Mostafa Hisham": "mostafa-hisham",
+        "Nicolas Mollet": "nicomollet",
+        "Cyrille Coquard": "CrochetFeve025",
+        "John Gathure": "johngathure",
+        "Michael Lee": "jeawhanlee",
+        "Mathieu Lamiot": "MathieuLamiot"
+    }
 }
