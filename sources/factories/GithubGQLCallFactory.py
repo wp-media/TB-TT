@@ -94,19 +94,13 @@ class GithubGQLCallFactory():
             result = None
         return result
 
-    def set_task_to_current_sprint(self, app_context, project_item_id):
+    def set_task_field_value(self, app_context, project_item_id, field_id, value_id):
         """
-            Performs a GitHub mutation to assign the given task to the current sprint of the project.
+            Performs a GitHub mutation to assign the given value to the given field for the given task.
         """
-
-        mutation_param = {}
-        iteration_id = self.get_current_sprint_id(app_context)
-        if iteration_id is None:
-            raise ValueError('Current iteration not found.')
-
         query = gql.gql(
             """
-            mutation SetSprintToProjectV2Task($fieldMutation: UpdateProjectV2ItemFieldValueInput!) {
+            mutation SetValueToProjectV2TaskField($fieldMutation: UpdateProjectV2ItemFieldValueInput!) {
                 updateProjectV2ItemFieldValue(input: $fieldMutation) {
                     clientMutationId
                 }
@@ -114,16 +108,33 @@ class GithubGQLCallFactory():
         """
         )
 
+        mutation_param = {}
         mutation_param['clientMutationId'] = 'my_key'
         mutation_param['projectId'] = self.github_config['projectId']
         mutation_param['itemId'] = project_item_id
-        mutation_param['fieldId'] = self.github_config['sprintFieldId']
-        mutation_param['value'] = {'iterationId': iteration_id}
+        mutation_param['fieldId'] = field_id
+        mutation_param['value'] = value_id
 
         query_params = {}
         query_params['fieldMutation'] = mutation_param
 
         self.__send_gql_request(app_context, query, query_params)
+
+    def set_task_to_current_sprint(self, app_context, project_item_id):
+        """
+            Performs a GitHub mutation to assign the given task to the current sprint of the project.
+        """
+
+        iteration_id = self.get_current_sprint_id(app_context)
+        if iteration_id is None:
+            raise ValueError('Current iteration not found.')
+
+        self.set_task_field_value(
+            app_context,
+            project_item_id,
+            self.github_config['sprintFieldId'],
+            {'iterationId': iteration_id}
+        )
 
     def get_current_sprint_id(self, app_context):
         """
@@ -163,7 +174,18 @@ class GithubGQLCallFactory():
             return None
         return None
 
-    def create_github_task(self, app_context, task_params):
+    def set_task_to_initial_status(self, app_context, project_item_id):
+        """
+            Performs a GitHub mutation to assign initial status to the task.
+        """
+        self.set_task_field_value(
+            app_context,
+            project_item_id,
+            self.github_config['statusFieldId'],
+            {'singleSelectOptionId': self.github_config['initialStatusValue']}
+        )
+
+    def create_github_task(self, app_context, mutation_param):
         """
             Create a GitHub task in the configured project according to the task parameters.
             To do so, a GQL Mutation is requested to the GitHub API.
@@ -171,28 +193,15 @@ class GithubGQLCallFactory():
             task_params:
                 - title (Mandatory): Title of the task
                 - body (Mandatory): Description of the task
+                - assigneeIds (optional): ID of the GitHub user to assign the task to
         """
-        mutation_param = {}
+
         # Check mandatory parameters
-        if 'title' not in task_params:
+        if 'title' not in mutation_param:
             raise TypeError('Missing title in task_params')
-        mutation_param['title'] = task_params['title']
 
-        if 'body' not in task_params:
+        if 'body' not in mutation_param:
             raise TypeError('Missing body in task_params')
-        mutation_param['body'] = task_params['body']
-
-        # Check optional parameters
-        handle_immediately = False
-        if 'handle_immediately' in task_params:
-            handle_immediately = task_params['handle_immediately']
-
-        assignee_id = None
-        if 'assignee' in task_params and 'no-assignee' != task_params['assignee']:
-            assignee = task_params['assignee']
-            assignee_id = self.get_user_id_from_login(app_context, assignee)
-        if assignee_id is not None:
-            mutation_param['assigneeIds'] = [assignee_id]
 
         query = gql.gql(
             """
@@ -214,10 +223,9 @@ class GithubGQLCallFactory():
 
         response = self.__send_gql_request(app_context, query, query_params)
 
-        if handle_immediately:
-            try:
-                # pylint: disable-next=unsubscriptable-object
-                project_item_id = response['addProjectV2DraftIssue']['projectItem']['id']
-            except KeyError:
-                return
-            self.set_task_to_current_sprint(app_context, project_item_id)
+        try:
+            # pylint: disable-next=unsubscriptable-object
+            project_item_id = response['addProjectV2DraftIssue']['projectItem']['id']
+        except KeyError:
+            project_item_id = None
+        return project_item_id

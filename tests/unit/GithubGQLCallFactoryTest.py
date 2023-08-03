@@ -38,7 +38,7 @@ def mock_send_gql_request_set_current_sprint(*args, **kwargs):
     assert args[2]['fieldMutation']['value'] == {'iterationId': 'the_iteration_id'}
     assert args[1] == gql.gql(
             """
-            mutation SetSprintToProjectV2Task($fieldMutation: UpdateProjectV2ItemFieldValueInput!) {
+            mutation SetValueToProjectV2TaskField($fieldMutation: UpdateProjectV2ItemFieldValueInput!) {
                 updateProjectV2ItemFieldValue(input: $fieldMutation) {
                     clientMutationId
                 }
@@ -263,10 +263,9 @@ def test_create_github_task_missing_body():
     assert error_caught
 
 
-@patch.object(GithubGQLCallFactory, "set_task_to_current_sprint", side_effect=mock_set_task_to_current_sprint)
 @patch.object(GithubGQLCallFactory, "_GithubGQLCallFactory__send_gql_request",
               side_effect=mock_send_gql_request_create_task_mandatory)
-def test_create_github_task_handle_immediately_true(mock_sendrequest, mock_setcurrentsprint):
+def test_create_github_task_handle_immediately_true(mock_sendrequest):
     """
         Test create_github_task with request to handle immediately
     """
@@ -275,7 +274,6 @@ def test_create_github_task_handle_immediately_true(mock_sendrequest, mock_setcu
     task_params = {"title": "the_title", "body": "the_body", "handle_immediately": True}
     github_gql_call_factory.create_github_task('app_context', task_params)
     mock_sendrequest.assert_called_once()
-    mock_setcurrentsprint.assert_called_once()
 
 
 @patch.object(GithubGQLCallFactory, "_GithubGQLCallFactory__send_gql_request",
@@ -308,20 +306,17 @@ def test_create_github_task_handle_immediately_error(mock_sendrequest, mock_setc
     mock_setcurrentsprint.assert_not_called()
 
 
-@patch.object(GithubGQLCallFactory, 'get_user_id_from_login',
-              side_effect=mock_get_user_id_from_login)
 @patch.object(GithubGQLCallFactory, "_GithubGQLCallFactory__send_gql_request",
               side_effect=mock_send_gql_request_create_task_assignee)
-def test_create_github_task_assignee_filled(mock_sendrequest, mock_login):
+def test_create_github_task_assignee_filled(mock_sendrequest):
     """
         Test create_github_task with an assignee
     """
     github_gql_call_factory = GithubGQLCallFactory()
     github_gql_call_factory.github_config['projectId'] = 'the_project_id'
-    task_params = {"title": "the_title", "body": "the_body", "assignee": 'the_assignee'}
+    task_params = {"title": "the_title", "body": "the_body", "assigneeIds": ['the_user_id']}
     github_gql_call_factory.create_github_task('app_context', task_params)
     mock_sendrequest.assert_called_once()
-    mock_login.assert_called_once()
 
 
 @patch.object(GithubGQLCallFactory, 'get_user_id_from_login',
