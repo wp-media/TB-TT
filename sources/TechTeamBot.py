@@ -3,8 +3,8 @@
 """
 
 import json
-import os
 from pathlib import Path
+from decouple import config
 from sources.FlaskAppWrapper import FlaskAppWrapper
 from sources.listeners.SlackInteractionListener import SlackInteractionListener
 import sources.utils.Constants as cst
@@ -25,7 +25,9 @@ class TechTeamBot(FlaskAppWrapper):
             Reads var_name in environment variables and store it as an app.config under key_name.
             Throws a KeyError if it is not found.
         """
-        self.app.config[key_name] = os.getenv(var_name)
+        BASE_DIR = Path(__file__).parent.parent  # noqa :F841 # pylint: disable=invalid-name, unused-variable
+        self.app.config[key_name] = config(var_name)
+        print(key_name + ' ' + self.app.config[key_name])
         if self.app.config[key_name] is None:
             raise KeyError(var_name + ' is not found.')
 
