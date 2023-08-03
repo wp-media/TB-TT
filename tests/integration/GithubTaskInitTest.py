@@ -1,23 +1,29 @@
 """
     Integration tests for the Github task creation
 """
-from unittest.mock import patch, call, ANY
+
+import json
+from pathlib import Path
+from unittest.mock import patch
 from freezegun import freeze_time
 from sources.handlers.GithubTaskHandler import GithubTaskHandler
 from sources.factories.GithubGQLCallFactory import GithubGQLCallFactory
 
 # pylint: disable=unused-argument
 
-def mock_send_gql_request_all_fields(*args, **kwargs):
+
+def mock_send_gql_request_all_fields(*args, **kwargs):  # noqa: C901
     """
-        This is the mock for all send_gql_request for the test_init_github_task_all_fields
+        This is the mock for all send_gql_request for the test_init_github_task_all_fields.
+        It checks the values of the query_params for each requests.
     """
-    if 'login' in args[2]:
+    def check_login_request(*args, **kwargs):
         # This is the request for user ID
         if args[2]['login'] != 'the_assignee':
             raise ValueError
         return {'user': {'id': 'the_assignee_id'}}
-    if 'task' in args[2] and 'title' in args[2]['task'] and 'body' in args[2]['task']:
+
+    def check_task_creation_request(*args, **kwargs):
         # This is the task creation ID
         if args[2]['task']['title'] != 'the_title':
             raise ValueError
@@ -26,35 +32,49 @@ def mock_send_gql_request_all_fields(*args, **kwargs):
         if args[2]['task']['assigneeIds'] != ['the_assignee_id']:
             raise ValueError
         return {'addProjectV2DraftIssue': {'projectItem': {'id': 'the_item_id'}}}
-    if 'fieldMutation' in args[2]:
+
+    def check_status_request(*args, **kwargs):
         # Those are calls to set fields
         if 'iterationId' in args[2]['fieldMutation']['value']:
+            # Call to set sprint
             if args[2]['fieldMutation']['value']['iterationId'] != "8824dd79":
                 raise ValueError
+            with open(Path(__file__).parent.parent.parent / "config" / "github.json", encoding='utf-8') as file_github_config:
+                github_config = json.load(file_github_config)
+                if args[2]['fieldMutation']['fieldId'] != github_config["sprintFieldId"]:
+                    raise ValueError
+
+        elif 'singleSelectOptionId' in args[2]['fieldMutation']['value']:
+            # Call to set status
+            with open(Path(__file__).parent.parent.parent / "config" / "github.json", encoding='utf-8') as file_github_config:
+                github_config = json.load(file_github_config)
+                if args[2]['fieldMutation']['value']['singleSelectOptionId'] != github_config["initialStatusValue"]:
+                    raise ValueError
+                if args[2]['fieldMutation']['fieldId'] != github_config["statusFieldId"]:
+                    raise ValueError
+
+        else:
+            raise ValueError
         return {}
-    if 'node_id' in args[2]:
+
+    def check_get_sprints_request(*args, **kwargs):
         # This is a get node request for the sprint:
-        return {
-            "node": {
-                "configuration": {
-                    "duration": 14,
-                    "iterations": [
-                        {
-                            "id": "8824dd79",
-                            "startDate": "2023-07-17"
-                        },
-                        {
-                            "id": "d8a8bb1d",
-                            "startDate": "2023-07-31"
-                        },
-                        {
-                            "id": "57d4c421",
-                            "startDate": "2023-08-14"
-                        }
-                    ]
-                }
-            }
-        }
+        with open(Path(__file__).parent.parent / "utils" / "GithubGQLReturns.json", encoding='utf-8') as file_github_config:
+            returns = json.load(file_github_config)
+            return returns["get_iterations"]
+
+    if 'login' in args[2]:
+        return check_login_request(*args, **kwargs)
+
+    if 'task' in args[2] and 'title' in args[2]['task'] and 'body' in args[2]['task']:
+        return check_task_creation_request(*args, **kwargs)
+
+    if 'fieldMutation' in args[2]:
+        return check_status_request(*args, **kwargs)
+
+    if 'node_id' in args[2]:
+        return check_get_sprints_request(*args, **kwargs)
+
     raise ValueError
 
 # pylint: enable=unused-argument

@@ -2,7 +2,9 @@
     Unit tests for the SlackModalFactoryTest.py main file
 """
 
-from unittest.mock import patch
+import json
+from pathlib import Path
+from unittest.mock import patch, ANY
 import gql
 from freezegun import freeze_time
 from sources.factories.GithubGQLCallFactory import GithubGQLCallFactory
@@ -151,28 +153,10 @@ def mock_send_gql_request_get_iterations(*args, **kwargs):
     """
         Mock the send_sql_request to query sprint iterations.
     """
-    print('toto')
-    return {
-            "node": {
-                "configuration": {
-                    "duration": 14,
-                    "iterations": [
-                        {
-                            "id": "8824dd79",
-                            "startDate": "2023-07-17"
-                        },
-                        {
-                            "id": "d8a8bb1d",
-                            "startDate": "2023-07-31"
-                        },
-                        {
-                            "id": "57d4c421",
-                            "startDate": "2023-08-14"
-                        }
-                    ]
-                }
-            }
-        }
+    with open(Path(__file__).parent.parent / "utils" / "GithubGQLReturns.json", encoding='utf-8') as file_github_config:
+        returns = json.load(file_github_config)
+        return returns["get_iterations"]
+
 # pylint: enable=unused-argument
 
 
@@ -384,3 +368,34 @@ def test_get_current_sprint_id_error(mock_sendrequest):
     result = github_gql_call_factory.get_current_sprint_id('app_context')
     mock_sendrequest.assert_called_once()
     assert result is None
+
+
+@patch.object(GithubGQLCallFactory, "_GithubGQLCallFactory__send_gql_request")
+def test_set_task_field_value(mock_sendrequest):
+    """
+        Test get_current_sprint_id with unexpected return from the GitHub API
+    """
+
+    project_item_id = 'the_item_id'
+
+    github_gql_call_factory = GithubGQLCallFactory()
+    project_id = 'the_project_id'
+    status_field_id = 'the_status_field_id'
+    initial_status_value = 'the_initial_status_value_id'
+    github_gql_call_factory.github_config = {
+        'projectId': project_id,
+        'statusFieldId': status_field_id,
+        'initialStatusValue': initial_status_value
+    }
+    github_gql_call_factory.set_task_to_initial_status('app_context', project_item_id)
+
+    expected_params = {
+        'fieldMutation': {
+            'clientMutationId': 'my_key',
+            'projectId': project_id,
+            'itemId': project_item_id,
+            'fieldId': status_field_id,
+            'value': {'singleSelectOptionId': initial_status_value}
+        }
+    }
+    mock_sendrequest.assert_called_once_with('app_context', ANY, expected_params)

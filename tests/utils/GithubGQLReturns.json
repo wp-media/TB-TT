@@ -1,0 +1,23 @@
+{
+    "get_iterations": {
+        "node": {
+            "configuration": {
+                "duration": 14,
+                "iterations": [
+                    {
+                        "id": "8824dd79",
+                        "startDate": "2023-07-17"
+                    },
+                    {
+                        "id": "d8a8bb1d",
+                        "startDate": "2023-07-31"
+                    },
+                    {
+                        "id": "57d4c421",
+                        "startDate": "2023-08-14"
+                    }
+                ]
+            }
+        }
+    }
+}
