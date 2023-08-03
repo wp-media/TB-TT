@@ -106,7 +106,7 @@ class GithubGQLCallFactory():
 
         query = gql.gql(
             """
-            mutation CreateProjectV2Task($fieldMutation: UpdateProjectV2ItemFieldValueInput!) {
+            mutation SetSprintToProjectV2Task($fieldMutation: UpdateProjectV2ItemFieldValueInput!) {
                 updateProjectV2ItemFieldValue(input: $fieldMutation) {
                     clientMutationId
                 }

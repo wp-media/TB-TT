@@ -38,7 +38,7 @@ def mock_send_gql_request_set_current_sprint(*args, **kwargs):
     assert args[2]['fieldMutation']['value'] == {'iterationId': 'the_iteration_id'}
     assert args[1] == gql.gql(
             """
-            mutation CreateProjectV2Task($fieldMutation: UpdateProjectV2ItemFieldValueInput!) {
+            mutation SetSprintToProjectV2Task($fieldMutation: UpdateProjectV2ItemFieldValueInput!) {
                 updateProjectV2ItemFieldValue(input: $fieldMutation) {
                     clientMutationId
                 }
