@@ -27,7 +27,7 @@ class TechTeamBot(FlaskAppWrapper):
         """
         BASE_DIR = Path(__file__).parent.parent  # noqa :F841 # pylint: disable=invalid-name, unused-variable
         self.app.config[key_name] = config(var_name)
-        print(key_name + ' ' + self.app.config[key_name])
+
         if self.app.config[key_name] is None:
             raise KeyError(var_name + ' is not found.')
 
