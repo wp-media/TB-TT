@@ -7,6 +7,7 @@ from pathlib import Path
 from decouple import config
 from sources.FlaskAppWrapper import FlaskAppWrapper
 from sources.listeners.SlackInteractionListener import SlackInteractionListener
+from sources.listeners.SlackCommandListener import SlackCommandListener
 import sources.utils.Constants as cst
 
 
@@ -44,7 +45,14 @@ class TechTeamBot(FlaskAppWrapper):
             Creates the endpoint for Slack interactions
         """
         slack_interaction_endpoint = SlackInteractionListener()
-        self.add_endpoint("/slack/interaction", endpoint_name='ad', handler=slack_interaction_endpoint, methods=['POST'])
+        self.add_endpoint("/slack/interaction", endpoint_name='slack_interaction', handler=slack_interaction_endpoint, methods=['POST'])
+
+    def __setup_slack_command_endpoint(self):
+        """
+            Creates the endpoint for Slack interactions
+        """
+        slack_command_endpoint = SlackCommandListener()
+        self.add_endpoint("/slack/command", endpoint_name='slack_command', handler=slack_command_endpoint, methods=['POST'])
 
     def __load_config(self):
         with open(Path(__file__).parent.parent / "config" / "app.json", encoding='utf-8') as file_app_config:
@@ -57,6 +65,7 @@ class TechTeamBot(FlaskAppWrapper):
         self.__load_config()
         self.__setup_keys()
         self.__setup_slack_interaction_endpoint()
+        self.__setup_slack_command_endpoint()
 
     def run(self, **kwargs):
         self.app.run(port=self.__app_config['port'], **kwargs)
