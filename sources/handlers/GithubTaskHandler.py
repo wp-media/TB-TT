@@ -65,9 +65,11 @@ class GithubTaskHandler():
                 self.slack_message_factory.post_message(app_context, task_params.initiator, text)
 
             if 'dev-team-escalation' == task_params.flow:
-                text = task_params.title + ' ' + self.get_task_link(
+                text = f"{task_params.title} by <@{task_params.initiator}>: " + self.get_task_link(
                     project_item.project_number, project_item.item_database_id)
-                self.slack_message_factory.post_message(app_context, task_params.initiator, text) # task_params.initiator to modify
+                self.slack_message_factory.post_message(app_context,
+                                                        self.slack_message_factory.get_channel(task_params.flow),
+                                                        text)
 
             # Set the task to Todo
             self.github_gql_call_factory.set_task_to_initial_status(app_context, project_item.item_id)
