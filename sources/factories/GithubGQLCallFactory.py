@@ -186,6 +186,17 @@ class GithubGQLCallFactory():
             {'singleSelectOptionId': self.github_config['initialStatusValue']}
         )
 
+    def set_task_to_dev_team_escalation_type(self, app_context, project_item_id):
+        """
+            Performs a GitHub mutation to assign the type dev-team-escalation
+        """
+        self.set_task_field_value(
+            app_context,
+            project_item_id,
+            self.github_config['typeFieldId'],
+            {'singleSelectOptionId': self.github_config['dev-team-escalationStatusValue']}
+        )
+
     def create_github_task(self, app_context, mutation_param):
         """
             Create a GitHub task in the configured project according to the task parameters.

@@ -65,6 +65,10 @@ class GithubTaskHandler():
                 self.slack_message_factory.post_message(app_context, task_params.initiator, text)
 
             if 'dev-team-escalation' == task_params.flow:
+                # Set the issue type
+                self.github_gql_call_factory.set_task_to_dev_team_escalation_type(app_context, project_item.item_id)
+
+                # Send message on Slack channel
                 text = f"{task_params.title} by <@{task_params.initiator}>: " + self.get_task_link(
                     project_item.project_number, project_item.item_database_id)
                 self.slack_message_factory.post_message(app_context,
