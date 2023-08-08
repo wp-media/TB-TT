@@ -56,7 +56,9 @@ class SlackViewSubmissionHandler():
         task_params['title'] = modal_values['title_block']['task_title']['value']
 
         # Description component
-        task_params['body'] = modal_values['description_block']['task_description']['value']
+        body_input = modal_values['description_block']['task_description']['value']
+        user_name = payload_json["user"]["name"]
+        task_params['body'] = f"Task submitted by {user_name} through TBTT.\n\n{body_input}"
 
         # Immediate component
         keys = list(dict.keys(modal_values['immediately_block']))
