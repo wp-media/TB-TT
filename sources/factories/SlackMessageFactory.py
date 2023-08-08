@@ -41,5 +41,4 @@ class SlackMessageFactory(SlackFactoryAbstract):
         """
         if 'dev-team-escalation' == flow:
             return self.slack_config["dev-team-escalation-channel"]
-        else:
-            raise ValueError('Unknown flow for get_channel.')
+        raise ValueError('Unknown flow for get_channel.')

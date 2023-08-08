@@ -45,7 +45,8 @@ class TechTeamBot(FlaskAppWrapper):
             Creates the endpoint for Slack interactions
         """
         slack_interaction_endpoint = SlackInteractionListener()
-        self.add_endpoint("/slack/interaction", endpoint_name='slack_interaction', handler=slack_interaction_endpoint, methods=['POST'])
+        self.add_endpoint("/slack/interaction", endpoint_name='slack_interaction',
+                          handler=slack_interaction_endpoint, methods=['POST'])
 
     def __setup_slack_command_endpoint(self):
         """

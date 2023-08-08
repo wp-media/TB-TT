@@ -89,6 +89,7 @@ class SlackViewSubmissionHandler():
             Callback method to process a submitted modal "Create GitHub Task".
             The parameters of the task are extracted from the modal payload. A thread is started to generate the Github task.
         """
+        print(payload_json)
         task_params = self.dev_team_escalation_modal_retrieve_params(payload_json)
 
         thread = Thread(target=self.github_task_handler.init_github_task, kwargs={

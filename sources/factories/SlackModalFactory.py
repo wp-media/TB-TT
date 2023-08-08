@@ -125,7 +125,7 @@ class SlackModalFactory(SlackFactoryAbstract):
                         "multiline": true
                     },
                     "optional": false
-                },
+                }
             ],
             "close": {
                 "type": "plain_text",
