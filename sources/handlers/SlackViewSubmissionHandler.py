@@ -4,7 +4,7 @@
 
 from threading import Thread
 from flask import current_app
-from sources.factories.GithubGQLCallFactory import GithubGQLCallFactory
+from sources.handlers.GithubTaskHandler import GithubTaskHandler
 
 
 class SlackViewSubmissionHandler():
@@ -16,7 +16,7 @@ class SlackViewSubmissionHandler():
         """
             The handler instanciates the objects it needed to complete the processing of the request.
         """
-        self.github_gql_call_factory = GithubGQLCallFactory()
+        self.github_task_handler = GithubTaskHandler()
 
     def process(self, payload_json):
         """
@@ -40,7 +40,7 @@ class SlackViewSubmissionHandler():
         """
         task_params = self.create_github_task_modal_retrieve_params(payload_json)
 
-        thread = Thread(target=self.github_gql_call_factory.create_github_task, kwargs={
+        thread = Thread(target=self.github_task_handler.init_github_task, kwargs={
             "app_context": current_app.app_context(), "task_params": task_params})
         thread.start()
 

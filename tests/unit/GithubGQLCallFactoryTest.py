@@ -2,7 +2,9 @@
     Unit tests for the SlackModalFactoryTest.py main file
 """
 
-from unittest.mock import patch
+import json
+from pathlib import Path
+from unittest.mock import patch, ANY
 import gql
 from freezegun import freeze_time
 from sources.factories.GithubGQLCallFactory import GithubGQLCallFactory
@@ -38,7 +40,7 @@ def mock_send_gql_request_set_current_sprint(*args, **kwargs):
     assert args[2]['fieldMutation']['value'] == {'iterationId': 'the_iteration_id'}
     assert args[1] == gql.gql(
             """
-            mutation CreateProjectV2Task($fieldMutation: UpdateProjectV2ItemFieldValueInput!) {
+            mutation SetValueToProjectV2TaskField($fieldMutation: UpdateProjectV2ItemFieldValueInput!) {
                 updateProjectV2ItemFieldValue(input: $fieldMutation) {
                     clientMutationId
                 }
@@ -151,28 +153,10 @@ def mock_send_gql_request_get_iterations(*args, **kwargs):
     """
         Mock the send_sql_request to query sprint iterations.
     """
-    print('toto')
-    return {
-            "node": {
-                "configuration": {
-                    "duration": 14,
-                    "iterations": [
-                        {
-                            "id": "8824dd79",
-                            "startDate": "2023-07-17"
-                        },
-                        {
-                            "id": "d8a8bb1d",
-                            "startDate": "2023-07-31"
-                        },
-                        {
-                            "id": "57d4c421",
-                            "startDate": "2023-08-14"
-                        }
-                    ]
-                }
-            }
-        }
+    with open(Path(__file__).parent.parent / "utils" / "GithubGQLReturns.json", encoding='utf-8') as file_github_config:
+        returns = json.load(file_github_config)
+        return returns["get_iterations"]
+
 # pylint: enable=unused-argument
 
 
@@ -263,10 +247,9 @@ def test_create_github_task_missing_body():
     assert error_caught
 
 
-@patch.object(GithubGQLCallFactory, "set_task_to_current_sprint", side_effect=mock_set_task_to_current_sprint)
 @patch.object(GithubGQLCallFactory, "_GithubGQLCallFactory__send_gql_request",
               side_effect=mock_send_gql_request_create_task_mandatory)
-def test_create_github_task_handle_immediately_true(mock_sendrequest, mock_setcurrentsprint):
+def test_create_github_task_handle_immediately_true(mock_sendrequest):
     """
         Test create_github_task with request to handle immediately
     """
@@ -275,7 +258,6 @@ def test_create_github_task_handle_immediately_true(mock_sendrequest, mock_setcu
     task_params = {"title": "the_title", "body": "the_body", "handle_immediately": True}
     github_gql_call_factory.create_github_task('app_context', task_params)
     mock_sendrequest.assert_called_once()
-    mock_setcurrentsprint.assert_called_once()
 
 
 @patch.object(GithubGQLCallFactory, "_GithubGQLCallFactory__send_gql_request",
@@ -308,20 +290,17 @@ def test_create_github_task_handle_immediately_error(mock_sendrequest, mock_setc
     mock_setcurrentsprint.assert_not_called()
 
 
-@patch.object(GithubGQLCallFactory, 'get_user_id_from_login',
-              side_effect=mock_get_user_id_from_login)
 @patch.object(GithubGQLCallFactory, "_GithubGQLCallFactory__send_gql_request",
               side_effect=mock_send_gql_request_create_task_assignee)
-def test_create_github_task_assignee_filled(mock_sendrequest, mock_login):
+def test_create_github_task_assignee_filled(mock_sendrequest):
     """
         Test create_github_task with an assignee
     """
     github_gql_call_factory = GithubGQLCallFactory()
     github_gql_call_factory.github_config['projectId'] = 'the_project_id'
-    task_params = {"title": "the_title", "body": "the_body", "assignee": 'the_assignee'}
+    task_params = {"title": "the_title", "body": "the_body", "assigneeIds": ['the_user_id']}
     github_gql_call_factory.create_github_task('app_context', task_params)
     mock_sendrequest.assert_called_once()
-    mock_login.assert_called_once()
 
 
 @patch.object(GithubGQLCallFactory, 'get_user_id_from_login',
@@ -389,3 +368,34 @@ def test_get_current_sprint_id_error(mock_sendrequest):
     result = github_gql_call_factory.get_current_sprint_id('app_context')
     mock_sendrequest.assert_called_once()
     assert result is None
+
+
+@patch.object(GithubGQLCallFactory, "_GithubGQLCallFactory__send_gql_request")
+def test_set_task_field_value(mock_sendrequest):
+    """
+        Test get_current_sprint_id with unexpected return from the GitHub API
+    """
+
+    project_item_id = 'the_item_id'
+
+    github_gql_call_factory = GithubGQLCallFactory()
+    project_id = 'the_project_id'
+    status_field_id = 'the_status_field_id'
+    initial_status_value = 'the_initial_status_value_id'
+    github_gql_call_factory.github_config = {
+        'projectId': project_id,
+        'statusFieldId': status_field_id,
+        'initialStatusValue': initial_status_value
+    }
+    github_gql_call_factory.set_task_to_initial_status('app_context', project_item_id)
+
+    expected_params = {
+        'fieldMutation': {
+            'clientMutationId': 'my_key',
+            'projectId': project_id,
+            'itemId': project_item_id,
+            'fieldId': status_field_id,
+            'value': {'singleSelectOptionId': initial_status_value}
+        }
+    }
+    mock_sendrequest.assert_called_once_with('app_context', ANY, expected_params)
