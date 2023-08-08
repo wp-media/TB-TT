@@ -62,6 +62,10 @@ def mock_send_gql_request_create_task_mandatory(*args, **kwargs):
                 addProjectV2DraftIssue(input: $task) {
                     projectItem {
                         id
+                        databaseId
+                        project {
+                            number
+                        }
                     }
                 }
             }
@@ -84,6 +88,10 @@ def mock_send_gql_request_create_task_assignee(*args, **kwargs):
                 addProjectV2DraftIssue(input: $task) {
                     projectItem {
                         id
+                        databaseId
+                        project {
+                            number
+                        }
                     }
                 }
             }
@@ -106,6 +114,10 @@ def mock_send_gql_request_create_task_no_assignee(*args, **kwargs):
                 addProjectV2DraftIssue(input: $task) {
                     projectItem {
                         id
+                        databaseId
+                        project {
+                            number
+                        }
                     }
                 }
             }
