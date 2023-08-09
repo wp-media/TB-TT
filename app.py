@@ -7,4 +7,4 @@ app = TechTeamBot(flask_app)
 app.setup()
 # Start the server on port 3000
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0')
