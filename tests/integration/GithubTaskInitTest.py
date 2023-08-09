@@ -8,6 +8,7 @@ from unittest.mock import patch
 from freezegun import freeze_time
 from sources.handlers.GithubTaskHandler import GithubTaskHandler
 from sources.factories.GithubGQLCallFactory import GithubGQLCallFactory
+from sources.models.InitGithubTaskParam import InitGithubTaskParam
 
 # pylint: disable=unused-argument
 
@@ -88,7 +89,7 @@ def test_init_github_task_all_fields(mock_sendrequest):
         Test init_github_task with mandatory fields
     """
     github_task_handler = GithubTaskHandler()
-    task_params = {"title": "the_title", "body": "the_body", "handle_immediately": True, "assignee": 'the_assignee'}
+    task_params = InitGithubTaskParam(title="the_title", body="the_body", handle_immediately=True, assignee='the_assignee')
     github_task_handler.init_github_task('app_context', task_params)
 
     mock_sendrequest.assert_called()

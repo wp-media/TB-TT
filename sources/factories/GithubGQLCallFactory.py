@@ -9,6 +9,7 @@ from flask import current_app
 import gql
 from gql.transport.requests import RequestsHTTPTransport
 import sources.utils.Constants as cst
+from sources.models.CreatedGithubTaskParam import CreatedGithubTaskParam
 
 
 class GithubGQLCallFactory():
@@ -209,6 +210,10 @@ class GithubGQLCallFactory():
                 addProjectV2DraftIssue(input: $task) {
                     projectItem {
                         id
+                        databaseId
+                        project {
+                            number
+                        }
                     }
                 }
             }
@@ -223,9 +228,15 @@ class GithubGQLCallFactory():
 
         response = self.__send_gql_request(app_context, query, query_params)
 
+        project_item = {}
         try:
-            # pylint: disable-next=unsubscriptable-object
-            project_item_id = response['addProjectV2DraftIssue']['projectItem']['id']
+            # pylint: disable=unsubscriptable-object
+            project_item = CreatedGithubTaskParam(
+                response['addProjectV2DraftIssue']['projectItem']['id'],
+                response['addProjectV2DraftIssue']['projectItem']['databaseId'],
+                response['addProjectV2DraftIssue']['projectItem']['project']['number']
+            )
+            # pylint: enable=unsubscriptable-object
         except KeyError:
-            project_item_id = None
-        return project_item_id
+            project_item = None
+        return project_item

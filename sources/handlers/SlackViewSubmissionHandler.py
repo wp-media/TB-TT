@@ -5,6 +5,7 @@
 from threading import Thread
 from flask import current_app
 from sources.handlers.GithubTaskHandler import GithubTaskHandler
+from sources.models.InitGithubTaskParam import InitGithubTaskParam
 
 
 class SlackViewSubmissionHandler():
@@ -49,28 +50,34 @@ class SlackViewSubmissionHandler():
             This method extract the github task parameters from a submitted Slack modal "Create GitHub Task".
             Only the parameters found in the payload are set.
         """
-        task_params = {}
         modal_values = payload_json["view"]["state"]["values"]
 
         # Title component
-        task_params['title'] = modal_values['title_block']['task_title']['value']
+        title = modal_values['title_block']['task_title']['value']
 
         # Description component
         body_input = modal_values['description_block']['task_description']['value']
         user_name = payload_json["user"]["name"]
-        task_params['body'] = f"Task submitted by {user_name} through TBTT.\n\n{body_input}"
+        body = f"Task submitted by {user_name} through TBTT.\n\n{body_input}"
 
         # Immediate component
+        handle_immediately = False
         keys = list(dict.keys(modal_values['immediately_block']))
         selected_options = modal_values['immediately_block'][keys[0]]['selected_options']
         for selected_option in selected_options:
             if 'handle_immediately' == selected_option['value']:
-                task_params['handle_immediately'] = True
+                handle_immediately = True
 
         # Assignee component
+        assignee = 'no-assignee'
         keys = list(dict.keys(modal_values['assignee_block']))
         selected_option = modal_values['assignee_block'][keys[0]]['selected_option']
         if selected_option is not None:
-            task_params['assignee'] = selected_option['value']
+            assignee = selected_option['value']
+
+        # Initiator of the request
+        initiator = payload_json["user"]["id"]
+
+        task_params = InitGithubTaskParam(title, body, handle_immediately, assignee, initiator)
 
         return task_params
