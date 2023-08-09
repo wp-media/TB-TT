@@ -1,6 +1,6 @@
 {
-    "projectId": "PVT_kwHOAOhwBs4ANXSV",
-    "sprintFieldId": "PVTIF_lAHOAOhwBs4ANXSVzgIlmIQ",
+    "projectId": "PVT_kwDOAMEyYM4ASOQZ",
+    "sprintFieldId": "PVTIF_lADOAMEyYM4ASOQZzgL-iB8",
     "assigneeList": {
         "Ahmed Saeed": "engahmeds3ed",
         "Rémy Perona": "Tabrisrp",
@@ -11,9 +11,8 @@
         "Michael Lee": "jeawhanlee",
         "Mathieu Lamiot": "MathieuLamiot"
     },
-    "statusFieldId": "PVTSSF_lAHOAOhwBs4ANXSVzgIhzow",
-    "initialStatusValue": "f75ad846",
-    "typeFieldId": "PVTSSF_lAHOAOhwBs4ANXSVzgIlmP8",
-    "dev-team-escalationStatusValue": "a3943dbf"
-
+    "statusFieldId": "PVTSSF_lADOAMEyYM4ASOQZzgLoyz8",
+    "initialStatusValue": "4ff049da"
+    "typeFieldId": "PVTSSF_lADOAMEyYM4ASOQZzgMpvAY",
+    "dev-team-escalationStatusValue": "a179c173"
 }
