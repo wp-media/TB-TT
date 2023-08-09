@@ -1,0 +1,30 @@
+name: "Deployment: Production"
+
+concurrency: deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://wpm-tbtt.default.live1-k8s-cph3.one.com/
+    steps:
+      - name: Check out private action repo
+        uses: actions/checkout@v3
+        with:
+          repository: wp-media/group.one-deploy-action
+          ref: master
+          token: ${{ secrets.DEPLOY_ACTION_PAT }}
+          path: ./.github/actions/group.one-deploy-action
+      - name: Deploy to production
+        id: deploy
+        uses: ./.github/actions/group.one-deploy-action/
+        with:
+          application: wpm-tbtt
+          environment: production
+          token: ${{ secrets.DEPLOY_PROXY_TOKEN }}
