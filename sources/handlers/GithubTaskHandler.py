@@ -23,8 +23,7 @@ class GithubTaskHandler():
         """
             Generates the URL to display a Github task of WP Media from the project number and the project item number
         """
-        # return f"https://github.com/orgs/wp-media/projects/{project_number}?pane=issue&itemId={item_number}"
-        return f"https://github.com/users/MathieuLamiot/projects/{project_number}?pane=issue&itemId={item_number}"
+        return f"https://github.com/orgs/wp-media/projects/{project_number}?pane=issue&itemId={item_number}"
 
     def init_github_task(self, app_context, task_params: InitGithubTaskParam):
         """
