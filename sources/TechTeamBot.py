@@ -37,7 +37,7 @@ class TechTeamBot(FlaskAppWrapper):
         """
         self.__load_key("TBTT_SLACK_SIGNING_SECRET", cst.APP_CONFIG_TOKEN_SLACK_SIGNING_SECRET)
         self.__load_key("TBTT_SLACK_BOT_USER_TOKEN", cst.APP_CONFIG_TOKEN_SLACK_BOT_USER_TOKEN)
-        self.__load_key("TBTT_GITHUB_TOKEN", cst.APP_CONFIG_TOKEN_GITHUB_ACCESS_TOKEN)
+        self.__load_key("TBTT_GITHUB_ACCESS_TOKEN", cst.APP_CONFIG_TOKEN_GITHUB_ACCESS_TOKEN)
 
     def __setup_slack_interaction_endpoint(self):
         """
