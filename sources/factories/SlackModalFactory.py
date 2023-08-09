@@ -4,29 +4,18 @@
 import json
 from pathlib import Path
 import requests
-from flask import current_app
-import sources.utils.Constants as cst
+from sources.factories.SlackFactoryAbstract import SlackFactoryAbstract
 
 
-class SlackModalFactory():
+class SlackModalFactory(SlackFactoryAbstract):
     """
         Class capable of creating and opening modal views for Slack users.
     """
 
     def __init__(self):
+        SlackFactoryAbstract.__init__(self)
         self.open_view_url = 'https://slack.com/api/views.open'
-        self.__slack_bot_user_token = None
         self.__assignee_list = None
-
-    def __get_slack_bot_user_token(self, app_context):
-        """
-            Returns the Slack Bot User token of the app.
-            If not retrieved yet, it is retrieved from the Flask app configuration.
-        """
-        if self.__slack_bot_user_token is None:
-            app_context.push()  # The factory usually runs in a dedicated thread, so Flask app context must be applied.
-            self.__slack_bot_user_token = current_app.config[cst.APP_CONFIG_TOKEN_SLACK_BOT_USER_TOKEN]
-        return self.__slack_bot_user_token
 
     def __get_assignee_list(self):
         """
@@ -152,7 +141,7 @@ class SlackModalFactory():
             "private_metadata": "",
             "callback_id": "ttl_create_github_task_modal_submit"
         }'''
-        request_open_view_header = {"Authorization": "Bearer " + self.__get_slack_bot_user_token(app_context)}
+        request_open_view_header = {"Authorization": "Bearer " + self._get_slack_bot_user_token(app_context)}
         request_open_view_payload = {}
         request_open_view_payload['view'] = view
         request_open_view_payload['trigger_id'] = trigger_id

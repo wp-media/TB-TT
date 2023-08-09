@@ -1,4 +1,4 @@
-env
+*.env
 config/*
 *.pyc
 app-secrets.yml

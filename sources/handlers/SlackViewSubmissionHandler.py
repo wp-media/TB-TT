@@ -4,7 +4,8 @@
 
 from threading import Thread
 from flask import current_app
-from sources.factories.GithubGQLCallFactory import GithubGQLCallFactory
+from sources.handlers.GithubTaskHandler import GithubTaskHandler
+from sources.models.InitGithubTaskParam import InitGithubTaskParam
 
 
 class SlackViewSubmissionHandler():
@@ -16,7 +17,7 @@ class SlackViewSubmissionHandler():
         """
             The handler instanciates the objects it needed to complete the processing of the request.
         """
-        self.github_gql_call_factory = GithubGQLCallFactory()
+        self.github_task_handler = GithubTaskHandler()
 
     def process(self, payload_json):
         """
@@ -40,7 +41,7 @@ class SlackViewSubmissionHandler():
         """
         task_params = self.create_github_task_modal_retrieve_params(payload_json)
 
-        thread = Thread(target=self.github_gql_call_factory.create_github_task, kwargs={
+        thread = Thread(target=self.github_task_handler.init_github_task, kwargs={
             "app_context": current_app.app_context(), "task_params": task_params})
         thread.start()
 
@@ -49,26 +50,34 @@ class SlackViewSubmissionHandler():
             This method extract the github task parameters from a submitted Slack modal "Create GitHub Task".
             Only the parameters found in the payload are set.
         """
-        task_params = {}
         modal_values = payload_json["view"]["state"]["values"]
 
         # Title component
-        task_params['title'] = modal_values['title_block']['task_title']['value']
+        title = modal_values['title_block']['task_title']['value']
 
         # Description component
-        task_params['body'] = modal_values['description_block']['task_description']['value']
+        body_input = modal_values['description_block']['task_description']['value']
+        user_name = payload_json["user"]["name"]
+        body = f"Task submitted by {user_name} through TBTT.\n\n{body_input}"
 
         # Immediate component
+        handle_immediately = False
         keys = list(dict.keys(modal_values['immediately_block']))
         selected_options = modal_values['immediately_block'][keys[0]]['selected_options']
         for selected_option in selected_options:
             if 'handle_immediately' == selected_option['value']:
-                task_params['handle_immediately'] = True
+                handle_immediately = True
 
         # Assignee component
+        assignee = 'no-assignee'
         keys = list(dict.keys(modal_values['assignee_block']))
         selected_option = modal_values['assignee_block'][keys[0]]['selected_option']
         if selected_option is not None:
-            task_params['assignee'] = selected_option['value']
+            assignee = selected_option['value']
+
+        # Initiator of the request
+        initiator = payload_json["user"]["id"]
+
+        task_params = InitGithubTaskParam(title, body, handle_immediately, assignee, initiator)
 
         return task_params

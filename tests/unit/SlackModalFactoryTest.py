@@ -118,7 +118,7 @@ def test_get_assignee_list_multiple_calls(mock):
 
 def mock_get_slack_bot_user_token(*args, **kwargs):
     """
-        Mock of the __get_slack_bot_user_token to return a test token
+        Mock of the _get_slack_bot_user_token to return a test token
     """
     return 'the_test_token'
 
@@ -146,7 +146,7 @@ def mock_requests_post_validate_json(*args, **kwargs):
 @patch("requests.post", side_effect=mock_requests_post_validate_json)
 @patch("builtins.open", new_callable=mock_open,
        read_data='{"toto": "tata", "assigneeList":{"name1":"value1","name2":"value2"} }')
-@patch.object(SlackModalFactory, "_SlackModalFactory__get_slack_bot_user_token", side_effect=mock_get_slack_bot_user_token)
+@patch.object(SlackModalFactory, "_get_slack_bot_user_token", side_effect=mock_get_slack_bot_user_token)
 def test_create_github_task_modal(mock_gettoken, mock_openfile, mock_postrequest):
     """
         Test __get_assignee_list when the assigneeList key has values
