@@ -14,5 +14,9 @@
     "statusFieldId": "PVTSSF_lADOAMEyYM4ASOQZzgLoyz8",
     "initialStatusValue": "4ff049da",
     "typeFieldId": "PVTSSF_lADOAMEyYM4ASOQZzgMpvAY",
-    "dev-team-escalationStatusValue": "a179c173"
+    "dev-team-escalationStatusValue": "a179c173",
+    "board_views": {
+        "default": 6,
+        "dev-team-escalation": 14
+    }
 }
