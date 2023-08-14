@@ -30,6 +30,8 @@ class SlackViewSubmissionHandler():
         # Process the paylaod according to the callback
         if 'ttl_create_github_task_modal_submit' == callback:
             self.create_github_task_modal_submit_callback(payload_json)
+        elif 'ttl_dev_team_escalation_modal_submit' == callback:
+            self.dev_team_escalation_modal_submit_callback(payload_json)
         else:
             raise ValueError('Unknown modal callback.')
         return {"response_action": "clear"}
@@ -79,5 +81,46 @@ class SlackViewSubmissionHandler():
         initiator = payload_json["user"]["id"]
 
         task_params = InitGithubTaskParam(title, body, handle_immediately, assignee, initiator)
+
+        return task_params
+
+    def dev_team_escalation_modal_submit_callback(self, payload_json):
+        """
+            Callback method to process a submitted modal "Create GitHub Task".
+            The parameters of the task are extracted from the modal payload. A thread is started to generate the Github task.
+        """
+        print(payload_json)
+        task_params = self.dev_team_escalation_modal_retrieve_params(payload_json)
+
+        thread = Thread(target=self.github_task_handler.init_github_task, kwargs={
+            "app_context": current_app.app_context(), "task_params": task_params})
+        thread.start()
+
+    def dev_team_escalation_modal_retrieve_params(self, payload_json):
+        """
+            This method extract the github task parameters from a submitted Slack modal "Create GitHub Task".
+            Only the parameters found in the payload are set.
+        """
+        modal_values = payload_json["view"]["state"]["values"]
+
+        # Title component
+        title = modal_values['title_block']['task_title']['value']
+
+        # Description component
+        description_input = modal_values['description_block']['task_description']['value']
+        investigation_input = modal_values['investigation_block']['investigation_block']['value']
+        replication_input = modal_values['replication_block']['replication_block']['value']
+        user_name = payload_json["user"]["name"]
+        body = (f"Task submitted by {user_name} through TBTT.\n\n"
+                f"**Description of the issue:**\n{description_input}\n\n"
+                f"**Investigation performed:**\n{investigation_input}\n\n"
+                f"**How to reproduce:**\n{replication_input}\n\n"
+                )
+
+        # Initiator of the request
+        initiator = payload_json["user"]["id"]
+
+        task_params = InitGithubTaskParam(title, body, handle_immediately=True,
+                                          initiator=initiator, flow='dev-team-escalation')
 
         return task_params

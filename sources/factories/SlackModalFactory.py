@@ -43,6 +43,103 @@ class SlackModalFactory(SlackFactoryAbstract):
                                                 })
         return self.__assignee_list
 
+    def dev_team_escalation_modal(self, app_context, trigger_id):
+        """
+            Method to create and open the dev-team-escalation modal on Slack
+        """
+        view = '''{
+            "type": "modal",
+            "title": {
+                "type": "plain_text",
+                "text": "Create a Github task"
+            },
+            "blocks": [
+                {
+                    "type": "input",
+                    "block_id": "title_block",
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Subject"
+                    },
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "task_title",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Type in here"
+                        },
+                        "multiline": false
+                    },
+                    "optional": false
+                },
+                {
+                    "type": "input",
+                    "block_id": "description_block",
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Description of the issue"
+                    },
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "task_description",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Describe the issue."
+                        },
+                        "multiline": true
+                    },
+                    "optional": false
+                },
+                {
+                    "type": "input",
+                    "block_id": "investigation_block",
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Investigation performed"
+                    },
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "investigation_block",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Describe the investigations you already performed."
+                        },
+                        "multiline": true
+                    },
+                    "optional": false
+                },
+                {
+                    "type": "input",
+                    "block_id": "replication_block",
+                    "label": {
+                        "type": "plain_text",
+                        "text": "How to replicate the issue"
+                    },
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "replication_block",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Describe the steps to replicate."
+                        },
+                        "multiline": true
+                    },
+                    "optional": false
+                }
+            ],
+            "close": {
+                "type": "plain_text",
+                "text": "Cancel"
+            },
+            "submit": {
+                "type": "plain_text",
+                "text": "Save"
+            },
+            "private_metadata": "",
+            "callback_id": "ttl_dev_team_escalation_modal_submit"
+        }'''
+        self.send_modal(app_context, view, trigger_id)
+
     def create_github_task_modal(self, app_context, trigger_id):
         """
             Method to create and open the Create github task modal on Slack
@@ -141,6 +238,12 @@ class SlackModalFactory(SlackFactoryAbstract):
             "private_metadata": "",
             "callback_id": "ttl_create_github_task_modal_submit"
         }'''
+        self.send_modal(app_context, view, trigger_id)
+
+    def send_modal(self, app_context, view, trigger_id):
+        """
+            Handles the API request to post a modal
+        """
         request_open_view_header = {"Authorization": "Bearer " + self._get_slack_bot_user_token(app_context)}
         request_open_view_payload = {}
         request_open_view_payload['view'] = view
