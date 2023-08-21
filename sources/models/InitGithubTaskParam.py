@@ -15,3 +15,4 @@ class InitGithubTaskParam:
     handle_immediately: bool = False
     assignee: str = 'no-assignee'
     initiator: str = None
+    flow: str = 'create_github_task'
