@@ -142,8 +142,6 @@ class GithubTaskHandler():
         new_parent_message = old_parent_message_split[0]
         new_parent_message += '\n' + 'Status: ' + project_item_status + '\n'
         new_parent_message += 'Assignees: ' + project_item_assignees
-        print(slack_thread["text"])
-        print(new_parent_message)
         if slack_thread["text"] != new_parent_message:
             self.slack_message_factory.edit_message(app_context, slack_thread["channel"]["id"],
                                                     slack_thread["ts"], new_parent_message)

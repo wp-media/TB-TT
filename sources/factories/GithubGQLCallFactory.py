@@ -277,8 +277,6 @@ class GithubGQLCallFactory():
         query_params = {}
         query_params['node_id'] = node_id
         response = self.__send_gql_request(app_context, query, query_params)
-        if response is None:
-            raise ValueError('Could not retrieve project item.')
         # pylint: disable-next=unsubscriptable-object
         return response["node"]
 
@@ -303,7 +301,5 @@ class GithubGQLCallFactory():
         query_params = {}
         query_params['node_id'] = node_id
         response = self.__send_gql_request(app_context, query, query_params)
-        if response is None:
-            raise ValueError('Could not retrieve project item.')
         # pylint: disable-next=unsubscriptable-object
         return response["node"]
