@@ -81,6 +81,13 @@ class GithubTaskHandler():
                     )
                 self.slack_message_factory.post_message(app_context, task_params.initiator, text)
 
+            # Set the task to Todo
+            self.github_gql_call_factory.set_task_to_initial_status(app_context, project_item.item_id)
+
+            if task_params.handle_immediately:
+                # Set the task to the current sprint
+                self.github_gql_call_factory.set_task_to_current_sprint(app_context, project_item.item_id)
+
             if 'dev-team-escalation' == task_params.flow:
                 # Set the issue type
                 self.github_gql_call_factory.set_task_to_dev_team_escalation_type(app_context, project_item.item_id)
@@ -93,10 +100,3 @@ class GithubTaskHandler():
                 self.slack_message_factory.post_message(app_context,
                                                         self.slack_message_factory.get_channel(task_params.flow),
                                                         text)
-
-            # Set the task to Todo
-            self.github_gql_call_factory.set_task_to_initial_status(app_context, project_item.item_id)
-
-            if task_params.handle_immediately:
-                # Set the task to the current sprint
-                self.github_gql_call_factory.set_task_to_current_sprint(app_context, project_item.item_id)

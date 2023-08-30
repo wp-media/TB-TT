@@ -52,12 +52,13 @@ class GithubProjectItemHandler():
 
         # Search for Slack thread based on channel, author and itemId part of the GitHub link
         query = 'itemId=' + str(project_item_details["databaseId"]) + ' in:dev-team-escalation from:TB-TT'
-        found_slack_messages = self.slack_message_factory.search_message(app_context, query)
-        print(found_slack_messages)
+        try:
+            found_slack_messages = self.slack_message_factory.search_message(app_context, query)
+        except KeyError:
+            return
         slack_thread = found_slack_messages["messages"]["matches"][0]
-
         # Maybe update the thread parent
-        old_parent_message_split = slack_thread["text"].splitlines(True)
+        old_parent_message_split = slack_thread["text"].splitlines(False)
         new_parent_message = old_parent_message_split[0]
         new_parent_message += '\n' + 'Status: ' + project_item_status + '\n'
         new_parent_message += 'Assignees: ' + project_item_assignees
