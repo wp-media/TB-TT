@@ -5,7 +5,7 @@ import json
 from threading import Thread
 from pathlib import Path
 from flask import current_app
-from sources.handlers.GithubProjectItemHandler import GithubProjectItemHandler
+from sources.handlers.GithubTaskHandler import GithubTaskHandler
 
 
 class GithubWebhookHandler():
@@ -17,7 +17,7 @@ class GithubWebhookHandler():
         """
             The handler instanciates the objects it needed to complete the processing of the request.
         """
-        self.github_project_item_handler = GithubProjectItemHandler()
+        self.github_project_item_handler = GithubTaskHandler()
         with open(Path(__file__).parent.parent.parent / "config" / "github.json", encoding='utf-8') as file_github_config:
             self.github_config = json.load(file_github_config)
 
