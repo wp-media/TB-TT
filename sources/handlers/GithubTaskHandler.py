@@ -27,7 +27,7 @@ class GithubTaskHandler():
             Generates the URL to display a Github task of WP Media from the project number and the project item number
         """
         # pylint: disable-next=line-too-long
-        return f"https://github.com/orgs/wp-media/projects/{project_number}/views/{view_number}?pane=issue&itemId={item_number}"
+        return f"https://github.com/orgs/wp-media/projects/{project_number}/views/{view_number}?pane=issue&itemId={item_number}" # noqa
 
     def get_board_view(self, flow):
         """

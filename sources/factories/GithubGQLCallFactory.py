@@ -23,8 +23,6 @@ class GithubGQLCallFactory():
         """
         self.github_config = None
         self.__github_access_token = None
-        self.__github_http_transport = None
-        self.__github_gql_client = None
 
         self.github_gql_url = 'https://api.github.com/graphql'
         with open(Path(__file__).parent.parent.parent / "config" / "github.json", encoding='utf-8') as file_github_config:
@@ -42,24 +40,21 @@ class GithubGQLCallFactory():
 
     def __get_github_http_transport(self, app_context):
         """
-            Returns the HTTP Transport layer to the Github API.
-            If it is not created yet, the method creates it before returning.
+            Returns a HTTP Transport layer to the Github API.
         """
-        if self.__github_http_transport is None:
-            github_access_token = self.__get_github_access_token(app_context)
-            self.__github_http_transport = RequestsHTTPTransport(
+        github_access_token = self.__get_github_access_token(app_context)
+        github_http_transport = RequestsHTTPTransport(
                 url=self.github_gql_url, headers={'Authorization': f'Bearer {github_access_token}'})
-        return self.__github_http_transport
+        return github_http_transport
 
     def __get_github_gql_client(self, app_context):
         """
             Returns the GQL Client to the Github API.
             If it is not created yet, the method creates it before returning.
         """
-        if self.__github_gql_client is None:
-            github_http_transport = self.__get_github_http_transport(app_context)
-            self.__github_gql_client = gql.Client(transport=github_http_transport, fetch_schema_from_transport=True)
-        return self.__github_gql_client
+        github_http_transport = self.__get_github_http_transport(app_context)
+        github_gql_client = gql.Client(transport=github_http_transport, fetch_schema_from_transport=True)
+        return github_gql_client
 
     def __send_gql_request(self, app_context, query, params):
         """
@@ -251,3 +246,64 @@ class GithubGQLCallFactory():
         except KeyError:
             project_item = None
         return project_item
+
+    def get_dev_team_escalation_item_update(self, app_context, node_id):
+        """
+            Retrieves information on the project item relevant for the dev-team-escalation update flow
+        """
+        query = gql.gql("""
+                    query GetProjectItemForUpdate($node_id: ID!) {
+                        node(id: $node_id) {
+                            ... on ProjectV2Item {
+                                databaseId
+                                column: fieldValueByName(name: "Status") {
+                                    ... on ProjectV2ItemFieldSingleSelectValue {
+                                    name
+                                    }
+                                }
+                                draftIssue: content {
+                                    ... on DraftIssue {
+                                        assignees(first: 20) {
+                                            nodes {
+                                                login
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """)
+        query_params = {}
+        query_params['node_id'] = node_id
+        response = self.__send_gql_request(app_context, query, query_params)
+        if response is None:
+            raise ValueError('Could not retrieve project item.')
+        # pylint: disable-next=unsubscriptable-object
+        return response["node"]
+
+    def get_project_item_for_update(self, app_context, node_id):
+        """
+            Retrieves information on the project item relevant for the handler to select what flow to perform.
+            Currently returned: "Type" custom SingleSelect field
+        """
+        query = gql.gql("""
+                    query GetProjectItemForUpdate($node_id: ID!) {
+                        node(id: $node_id) {
+                            ... on ProjectV2Item {
+                                typeField: fieldValueByName(name: "Type") {
+                                    ... on ProjectV2ItemFieldSingleSelectValue {
+                                    name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """)
+        query_params = {}
+        query_params['node_id'] = node_id
+        response = self.__send_gql_request(app_context, query, query_params)
+        if response is None:
+            raise ValueError('Could not retrieve project item.')
+        # pylint: disable-next=unsubscriptable-object
+        return response["node"]
