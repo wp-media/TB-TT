@@ -17,6 +17,8 @@ env:
   TBTT_GITHUB_ACCESS_TOKEN: tbtt_github_token
   TBTT_SLACK_BOT_USER_TOKEN: tbtt_slack_bot_user_token
   TBTT_SLACK_SIGNING_SECRET: tbtt_slack_signing_secret
+  TBTT_SLACK_USER_TOKEN: tbtt_slack_user_token
+  TBTT_GITHUB_WEBHOOK_SECRET: tbtt_github_webhook_secret
 
 jobs:
   lint-and-test:
