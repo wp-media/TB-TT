@@ -134,7 +134,7 @@ class GithubTaskHandler():
             project_item_assignees = 'No one.'
 
         # Search for Slack thread based on channel, author and itemId part of the GitHub link
-        query = 'itemId=' + str(project_item_details["databaseId"]) + ' in:dev-team-escalation from:TB-TT'
+        query = 'itemId=' + str(project_item_details["databaseId"]) + ' in:dev-team-escalation from:tbtt'
         try:
             found_slack_messages = self.slack_message_factory.search_message(app_context, query)
         except KeyError as error:
