@@ -105,9 +105,10 @@ class GithubTaskHandler():
         """
             Processing method when a project item is updated.
         """
+        print("Entered process_update")
         # Get the item details
         project_item_details = self.github_gql_call_factory.get_project_item_for_update(app_context, node_id)
-
+        print(project_item_details)
         # Apply corresponding flows
         # dev-team-escalation update flow
         if (project_item_details["typeField"]
@@ -119,9 +120,11 @@ class GithubTaskHandler():
         """
             Perform the Slack update of a dev-team-escalation following an update of the GitHub draft issue
         """
+        print("Entered dev_team_escalation_update")
         # Get assignee, status, itemID
         project_item_details = self.github_gql_call_factory.get_dev_team_escalation_item_update(app_context, node_id)
         project_item_status = project_item_details["column"]["name"]
+        print(project_item_details)
         # Concatenate assignee logins
         project_item_assignees = ''
         if assignees_payload := project_item_details["draftIssue"]["assignees"]["nodes"]:
@@ -134,7 +137,8 @@ class GithubTaskHandler():
         query = 'itemId=' + str(project_item_details["databaseId"]) + ' in:dev-team-escalation from:TB-TT'
         try:
             found_slack_messages = self.slack_message_factory.search_message(app_context, query)
-        except KeyError:
+        except KeyError as error:
+            print(str(error))
             return
         slack_thread = found_slack_messages["messages"]["matches"][0]
         # Maybe update the thread parent
@@ -143,6 +147,7 @@ class GithubTaskHandler():
         new_parent_message += '\n' + 'Status: ' + project_item_status + '\n'
         new_parent_message += 'Assignees: ' + project_item_assignees
         if slack_thread["text"] != new_parent_message:
+            print('Posting')
             self.slack_message_factory.edit_message(app_context, slack_thread["channel"]["id"],
                                                     slack_thread["ts"], new_parent_message)
 
@@ -151,3 +156,5 @@ class GithubTaskHandler():
             thread_response += ' and currently assigned to: ' + project_item_assignees
             self.slack_message_factory.post_reply(app_context,
                                                   slack_thread["channel"]["id"], slack_thread["ts"], thread_response)
+        else:
+            print("Don't post")
