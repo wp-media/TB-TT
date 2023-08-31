@@ -39,11 +39,14 @@ class GithubWebhookHandler():
             Retrieve the node_id of the updated item and start a dedicated thread to handle the udpate
         """
         # Keep only update actions
+        print("Entered callback")
         if "action" not in payload_json or "edited" != payload_json["action"]:
+            print("Wrong action")
             return
         # Keep only changes on status or assignees
         if (payload_json["changes"]["field_value"]["field_type"] != "assignees" and
            payload_json["changes"]["field_value"]["field_node_id"] != self.github_config['statusFieldId']):
+            print("Wrong update type")
             return
 
         node_id = payload_json["projects_v2_item"]["node_id"]
