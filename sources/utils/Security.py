@@ -12,15 +12,15 @@ def validate_github_webhook_signature(payload, secret):
     """
 
     # Get the signature from the payload
-    signature_header = payload.headers['X-Hub-Signature']
+    signature_header = payload.headers['X-Hub-Signature-256']
     sha_name, github_signature = signature_header.split('=')
-    if sha_name != 'sha1':
-        print('ERROR: X-Hub-Signature in payload headers was not sha1=****')
+    if sha_name != 'sha256':
+        print('ERROR: X-Hub-Signature-256 in payload headers was not sha256=****')
         return False
 
     # Create our own signature
     body = payload.data
-    local_signature = hmac.new(secret.encode('utf-8'), msg=body, digestmod=hashlib.sha1)
+    local_signature = hmac.new(secret.encode(), msg=body, digestmod=hashlib.sha256)
 
     # See if they match
     return hmac.compare_digest(local_signature.hexdigest(), github_signature)
