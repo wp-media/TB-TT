@@ -16,4 +16,4 @@ RUN pip install -r requirements.txt --src /usr/local/src
 COPY . .
 
 EXPOSE 3000
-CMD [ "python", "-u", "app.py" ]
+CMD [ "python", "app.py" ]
