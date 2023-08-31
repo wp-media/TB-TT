@@ -8,6 +8,7 @@ from decouple import config
 from sources.FlaskAppWrapper import FlaskAppWrapper
 from sources.listeners.SlackInteractionListener import SlackInteractionListener
 from sources.listeners.SlackCommandListener import SlackCommandListener
+from sources.listeners.GithubWebhookListener import GithubWebhookListener
 import sources.utils.Constants as cst
 
 
@@ -38,7 +39,9 @@ class TechTeamBot(FlaskAppWrapper):
         """
         self.__load_key("TBTT_SLACK_SIGNING_SECRET", cst.APP_CONFIG_TOKEN_SLACK_SIGNING_SECRET)
         self.__load_key("TBTT_SLACK_BOT_USER_TOKEN", cst.APP_CONFIG_TOKEN_SLACK_BOT_USER_TOKEN)
+        self.__load_key("TBTT_SLACK_USER_TOKEN", cst.APP_CONFIG_TOKEN_SLACK_USER_TOKEN)
         self.__load_key("TBTT_GITHUB_ACCESS_TOKEN", cst.APP_CONFIG_TOKEN_GITHUB_ACCESS_TOKEN)
+        self.__load_key("TBTT_GITHUB_WEBHOOK_SECRET", cst.APP_CONFIG_TOKEN_GITHUB_WEBHOOK_SECRET)
 
     def __setup_slack_interaction_endpoint(self):
         """
@@ -55,6 +58,13 @@ class TechTeamBot(FlaskAppWrapper):
         slack_command_endpoint = SlackCommandListener()
         self.add_endpoint("/slack/command", endpoint_name='slack_command', handler=slack_command_endpoint, methods=['POST'])
 
+    def __setup_github_webhook_endpoint(self):
+        """
+            Creates the endpoint for Github webhooks
+        """
+        github_webhook_endpoint = GithubWebhookListener()
+        self.add_endpoint("/github/webhook", endpoint_name='github_webhook', handler=github_webhook_endpoint, methods=['POST'])
+
     def __load_config(self):
         with open(Path(__file__).parent.parent / "config" / "app.json", encoding='utf-8') as file_app_config:
             self.__app_config = json.load(file_app_config)
@@ -67,6 +77,7 @@ class TechTeamBot(FlaskAppWrapper):
         self.__setup_keys()
         self.__setup_slack_interaction_endpoint()
         self.__setup_slack_command_endpoint()
+        self.__setup_github_webhook_endpoint()
 
     def run(self, **kwargs):
         self.app.run(port=self.__app_config['port'], **kwargs)

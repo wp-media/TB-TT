@@ -35,7 +35,6 @@ def test_dev_team_escalation_modal_retrieve_params():
     task_param_uut = slack_submission_handler.dev_team_escalation_modal_retrieve_params(test_payload)
 
     assert "a" == task_param_uut.title
-    print(task_param_uut.body)
     # pylint: disable-next=line-too-long
     assert "Task submitted by mathieu.lamiot through TBTT.\n\n**Description of the issue:**\nb\n\n**Investigation performed:**\nc\n\n**How to reproduce:**\nd\n\n" == task_param_uut.body # noqa
     assert task_param_uut.handle_immediately
