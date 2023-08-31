@@ -36,12 +36,12 @@ class GithubWebhookListener():
             The method extracts the payload and route it to the correct handler.
             This method catches errors and manages their mapping to HTTP error codes.
         """
-        print("Webhook received")
+
         # Check the Webhook signature
         security_check = Security.validate_github_webhook_signature(request, self.__get_github_webhook_secret())
         if not security_check:
             return 'Wrong webhook signature.', 401
-        print("Webhook validated")
+
         # Retrieve the payload of the POST request
         payload_json = json.loads(request.data.decode('utf-8'))
         # Route the request to the correct handler
