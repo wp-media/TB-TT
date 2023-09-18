@@ -33,9 +33,15 @@ class SlackMessageFactory(SlackFactoryAbstract):
         request_open_view_payload = {}
         request_open_view_payload['channel'] = channel
         request_open_view_payload['text'] = text
-        requests.post(url=self.post_message_url,
-                      headers=request_open_view_header,
-                      json=request_open_view_payload, timeout=3000)
+        result = requests.post(url=self.post_message_url,
+                               headers=request_open_view_header,
+                               json=request_open_view_payload, timeout=3000)
+        if result is None:
+            raise ValueError('Slack post message failed.')
+        result_json = result.json()
+        if result_json["ok"] is False:
+            raise ValueError('Slack post message was not completed.')
+        return result_json
 
     def post_reply(self, app_context, channel, thread_ts, text):
         """
