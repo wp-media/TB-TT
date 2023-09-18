@@ -205,10 +205,30 @@ def test_init_github_task_no_initiator(mock_post_message, mock_getuser, mock_set
 @patch.object(GithubGQLCallFactory, "set_task_to_current_sprint")
 @patch.object(GithubGQLCallFactory, "get_user_id_from_login", return_value='the_user_id')
 @patch.object(GithubGQLCallFactory, "set_task_to_dev_team_escalation_type")
-@patch.object(SlackMessageFactory, "post_message")
+@patch.object(SlackMessageFactory, "post_message", return_value={
+                                                                "ok": True,
+                                                                "channel": "C123ABC456",
+                                                                "ts": "1503435956.000247",
+                                                                "message": {
+                                                                    "text": "Here's a message for you",
+                                                                    "username": "ecto1",
+                                                                    "bot_id": "B123ABC456",
+                                                                    "attachments": [
+                                                                        {
+                                                                            "text": "This is an attachment",
+                                                                            "id": 1,
+                                                                            "fallback": "This is an attachment's fallback"
+                                                                        }
+                                                                    ],
+                                                                    "type": "message",
+                                                                    "subtype": "bot_message",
+                                                                    "ts": "1503435956.000247"
+                                                                }
+                                                            })
+@patch.object(SlackMessageFactory, "post_reply")
 @patch.object(SlackMessageFactory, "get_channel", return_value='the_escalation_channel')
 # pylint: disable-next=too-many-arguments
-def test_init_github_task_dev_team_escalation(mock_getchannel, mock_post_message, mock_settasktype,
+def test_init_github_task_dev_team_escalation(mock_getchannel, mock_post_reply, mock_post_message, mock_settasktype,
                                               mock_getuser, mock_setsprint, mock_setstatus, mock_createtask):
     """
         Test init_github_task with the dev-team-escalation flow ot check the type is set
@@ -221,6 +241,9 @@ def test_init_github_task_dev_team_escalation(mock_getchannel, mock_post_message
 
     call_post_message = [call('app_context', 'U123456789', ANY), call('app_context', 'the_escalation_channel', ANY)]
     mock_post_message.assert_has_calls(call_post_message)
+
+    call_post_reply = [call('app_context', 'C123ABC456', "1503435956.000247", "the_body")]
+    mock_post_reply.assert_has_calls(call_post_reply)
 
     call_set_task_type = [call('app_context', "the_project_item_id")]
     mock_settasktype.assert_has_calls(call_set_task_type)

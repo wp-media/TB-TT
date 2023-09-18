@@ -93,13 +93,19 @@ class GithubTaskHandler():
                 self.github_gql_call_factory.set_task_to_dev_team_escalation_type(app_context, project_item.item_id)
 
                 # Send message on Slack channel
-                text = f"{task_params.title} by <@{task_params.initiator}>: " + self.get_task_link(
+                main_text = f"{task_params.title} by <@{task_params.initiator}>: " + self.get_task_link(
                     project_item.project_number,
                     self.get_board_view(task_params.flow),
                     project_item.item_database_id)
-                self.slack_message_factory.post_message(app_context,
-                                                        self.slack_message_factory.get_channel(task_params.flow),
-                                                        text)
+                thread = self.slack_message_factory.post_message(app_context,
+                                                                 self.slack_message_factory.get_channel(task_params.flow),
+                                                                 main_text)
+
+                # Add details of the escalation in the thread
+                if thread is not None:
+                    detail_text = f"{task_params.body}"
+                    self.slack_message_factory.post_reply(app_context,
+                                                          thread["channel"], thread["ts"], detail_text)
 
     def process_update(self, app_context, node_id):
         """
