@@ -13,7 +13,7 @@ def mock_request_post_message_check_params(*args, **kwargs):
     """
         Mocks the requests.post and check basic values for test_post_message
     """
-    class RequestReturn(object):
+    class RequestReturn():
         """
             Mocks the return of requests.post
          """
