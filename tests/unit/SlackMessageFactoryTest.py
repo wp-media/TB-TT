@@ -13,9 +13,42 @@ def mock_request_post_message_check_params(*args, **kwargs):
     """
         Mocks the requests.post and check basic values for test_post_message
     """
+    class RequestReturn(object):
+        """
+            Mocks the return of requests.post
+         """
+        status_code = 200
+
+        def json(self):
+            """
+                Mocks the json method of requests.post's return
+            """
+            json = {"ok": True,
+                    "channel": "C123ABC456",
+                    "ts": "1503435956.000247",
+                    "message": {
+                        "text": "Here's a message for you",
+                        "username": "ecto1",
+                        "bot_id": "B123ABC456",
+                        "attachments": [
+                            {
+                                "text": "This is an attachment",
+                                "id": 1,
+                                "fallback": "This is an attachment's fallback"
+                            }
+                        ],
+                        "type": "message",
+                        "subtype": "bot_message",
+                        "ts": "1503435956.000247"
+                    }
+                    }
+            return json
+
     assert 'https://slack.com/api/chat.postMessage' == kwargs['url']
     assert {"Content-type": "application/json", "Authorization": "Bearer " + 'the_token'} == kwargs['headers']
     assert {"channel": "the_channel", "text": "the_text"} == kwargs['json']
+    response = RequestReturn()
+    return response
 
 
 def mock_request_post_reply_check_params(*args, **kwargs):
