@@ -1,8 +1,9 @@
 name: Build
 on:
-  push:
-    branches:
-      - master # or the name of your main branch
+    pull_request:
+        branches: 
+          - 'develop'
+          - 'master'
 jobs:
   build:
     name: Build
