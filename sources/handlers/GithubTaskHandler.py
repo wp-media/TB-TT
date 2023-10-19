@@ -2,6 +2,7 @@
     This module defines the handler for GitHub task (ProjectV2Item) related logic.
 """
 import json
+from flask import current_app
 from pathlib import Path
 from sources.factories.GithubGQLCallFactory import GithubGQLCallFactory
 from sources.factories.SlackMessageFactory import SlackMessageFactory
@@ -120,6 +121,9 @@ class GithubTaskHandler():
            and project_item_details["typeField"]["name"]
            and project_item_details["typeField"]["name"] == 'dev-team-escalation'):
             self.dev_team_escalation_update(app_context, node_id)
+        else:
+            app_context.push()
+            current_app.logger.info("GitHubTaskHandler.process_update: No corresponding flow.")
 
     def dev_team_escalation_update(self, app_context, node_id):
         """
@@ -137,11 +141,8 @@ class GithubTaskHandler():
             project_item_assignees = 'No one.'
 
         # Search for Slack thread based on channel, author and itemId part of the GitHub link
-        query = 'itemId=' + str(project_item_details["databaseId"]) + ' in:dev-team-escalation from:tbtt'
-        try:
-            found_slack_messages = self.slack_message_factory.search_message(app_context, query)
-        except KeyError:
-            return
+        query = 'itemId=' + str(project_item_details["databaseId"]) + ' in:dev-team-escalation from:TB-TT'
+        found_slack_messages = self.slack_message_factory.search_message(app_context, query)
         slack_thread = found_slack_messages["messages"]["matches"][0]
         # Maybe update the thread parent
         old_parent_message_split = slack_thread["text"].splitlines(False)
@@ -157,3 +158,6 @@ class GithubTaskHandler():
             thread_response += ' and currently assigned to: ' + project_item_assignees
             self.slack_message_factory.post_reply(app_context,
                                                   slack_thread["channel"]["id"], slack_thread["ts"], thread_response)
+        else:
+            app_context.push()
+            current_app.logger.info("dev_team_escalation_update: Nex message identical to the current one.")
