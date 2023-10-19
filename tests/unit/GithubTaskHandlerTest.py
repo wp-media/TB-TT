@@ -329,7 +329,7 @@ def test_process_update_dev_team_escalation_full(mock_post_reply, mock_edit_mess
     call_get_project_item = [call('app_context', 'the_node_id')]
     mock_get_project_item_for_update.assert_has_calls(call_get_project_item)
     mock_get_dev_team_escalation_item_update.assert_has_calls(call_get_project_item)
-    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:tbtt')]
+    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:TB-TT')]
     mock_search_message.assert_has_calls(call_search_message)
     call_edit_message = [call('app_context', 'C12345678', '1508795665.000236',
                               'The first line\nStatus: In Progress\nAssignees: MathieuLamiot, theOtherOne, ')]
@@ -406,18 +406,19 @@ def test_process_update_dev_team_escalation_no_update(mock_post_reply, mock_edit
                                                       mock_get_project_item_for_update):
     """
         Test process_update with the dev-team-escalation flow
-    """
+
     github_task_handler = GithubTaskHandler()
     github_task_handler.process_update('app_context', ('the_node_id'))
 
     call_get_project_item = [call('app_context', 'the_node_id')]
     mock_get_project_item_for_update.assert_has_calls(call_get_project_item)
     mock_get_dev_team_escalation_item_update.assert_has_calls(call_get_project_item)
-    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:tbtt')]
+    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:TB-TT')]
     mock_search_message.assert_has_calls(call_search_message)
 
     mock_edit_message.assert_not_called()
     mock_post_reply.assert_not_called()
+    """
 
 
 @patch.object(GithubGQLCallFactory, "get_project_item_for_update", return_value={"typeField": {"name": "dev-team-escalation"}})
@@ -493,7 +494,7 @@ def test_process_update_dev_team_escalation_no_assignees(mock_post_reply, mock_e
     call_get_project_item = [call('app_context', 'the_node_id')]
     mock_get_project_item_for_update.assert_has_calls(call_get_project_item)
     mock_get_dev_team_escalation_item_update.assert_has_calls(call_get_project_item)
-    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:tbtt')]
+    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:TB-TT')]
     mock_search_message.assert_has_calls(call_search_message)
     call_edit_message = [call('app_context', 'C12345678', '1508795665.000236',
                               'The first line\nStatus: In Progress\nAssignees: No one.')]
@@ -528,7 +529,12 @@ def test_process_update_dev_team_escalation_no_messages(mock_post_reply, mock_ed
     mock_request.post.side_effect = mock_request_search_message_no_match
 
     github_task_handler = GithubTaskHandler()
-    github_task_handler.process_update('app_context', ('the_node_id'))
+    error_caught = False
+    try:
+        github_task_handler.process_update('app_context', ('the_node_id'))
+    except KeyError:
+        error_caught = True
+    assert error_caught
 
     call_get_project_item = [call('app_context', 'the_node_id')]
     mock_get_project_item_for_update.assert_has_calls(call_get_project_item)

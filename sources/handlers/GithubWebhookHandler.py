@@ -40,13 +40,16 @@ class GithubWebhookHandler():
         """
         # Keep only update actions
         if "action" not in payload_json or "edited" != payload_json["action"]:
+            current_app.logger.info("project_v2_item_update_callback: Not an update action.")
             return
         # Keep only changes on status or assignees
         if (payload_json["changes"]["field_value"]["field_type"] != "assignees" and
            payload_json["changes"]["field_value"]["field_node_id"] != self.github_config['statusFieldId']):
+            current_app.logger.info("project_v2_item_update_callback: Update not related to assignee nor status.")
             return
 
         node_id = payload_json["projects_v2_item"]["node_id"]
         thread = Thread(target=self.github_project_item_handler.process_update, kwargs={
             "app_context": current_app.app_context(), "node_id": node_id})
+        current_app.logger.info("project_v2_item_update_callback: Starting processing thread...")
         thread.start()

@@ -3,6 +3,7 @@
 """
 import hashlib
 import hmac
+from flask import current_app
 
 
 def validate_github_webhook_signature(payload, secret):
@@ -15,7 +16,7 @@ def validate_github_webhook_signature(payload, secret):
     signature_header = payload.headers['X-Hub-Signature-256']
     sha_name, github_signature = signature_header.split('=')
     if sha_name != 'sha256':
-        print('ERROR: X-Hub-Signature-256 in payload headers was not sha256=****')
+        current_app.logger.error('ERROR: X-Hub-Signature-256 in payload headers was not sha256=****')
         return False
 
     # Create our own signature
