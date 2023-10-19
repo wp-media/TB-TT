@@ -2,8 +2,8 @@
     This module defines the handler for GitHub task (ProjectV2Item) related logic.
 """
 import json
-from flask import current_app
 from pathlib import Path
+from flask import current_app
 from sources.factories.GithubGQLCallFactory import GithubGQLCallFactory
 from sources.factories.SlackMessageFactory import SlackMessageFactory
 from sources.models.InitGithubTaskParam import InitGithubTaskParam

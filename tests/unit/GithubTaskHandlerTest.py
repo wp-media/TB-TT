@@ -406,8 +406,7 @@ def test_process_update_dev_team_escalation_no_update(mock_post_reply, mock_edit
                                                       mock_get_project_item_for_update):
     """
         Test process_update with the dev-team-escalation flow
-    """
-    """
+
     github_task_handler = GithubTaskHandler()
     github_task_handler.process_update('app_context', ('the_node_id'))
 
