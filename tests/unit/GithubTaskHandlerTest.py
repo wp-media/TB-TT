@@ -329,7 +329,7 @@ def test_process_update_dev_team_escalation_full(mock_post_reply, mock_edit_mess
     call_get_project_item = [call('app_context', 'the_node_id')]
     mock_get_project_item_for_update.assert_has_calls(call_get_project_item)
     mock_get_dev_team_escalation_item_update.assert_has_calls(call_get_project_item)
-    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:TB-TT')]
+    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:tbtt')]
     mock_search_message.assert_has_calls(call_search_message)
     call_edit_message = [call('app_context', 'C12345678', '1508795665.000236',
                               'The first line\nStatus: In Progress\nAssignees: MathieuLamiot, theOtherOne, ')]
@@ -413,7 +413,7 @@ def test_process_update_dev_team_escalation_no_update(mock_post_reply, mock_edit
     call_get_project_item = [call('app_context', 'the_node_id')]
     mock_get_project_item_for_update.assert_has_calls(call_get_project_item)
     mock_get_dev_team_escalation_item_update.assert_has_calls(call_get_project_item)
-    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:TB-TT')]
+    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:tbtt')]
     mock_search_message.assert_has_calls(call_search_message)
 
     mock_edit_message.assert_not_called()
@@ -494,7 +494,7 @@ def test_process_update_dev_team_escalation_no_assignees(mock_post_reply, mock_e
     call_get_project_item = [call('app_context', 'the_node_id')]
     mock_get_project_item_for_update.assert_has_calls(call_get_project_item)
     mock_get_dev_team_escalation_item_update.assert_has_calls(call_get_project_item)
-    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:TB-TT')]
+    call_search_message = [call('app_context', 'itemId=123456 in:dev-team-escalation from:tbtt')]
     mock_search_message.assert_has_calls(call_search_message)
     call_edit_message = [call('app_context', 'C12345678', '1508795665.000236',
                               'The first line\nStatus: In Progress\nAssignees: No one.')]
