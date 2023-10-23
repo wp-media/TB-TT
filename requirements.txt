@@ -26,6 +26,7 @@ lazy-object-proxy==1.9.0
 MarkupSafe==2.1.3
 mccabe==0.7.0
 multidict==6.0.4
+ovh==1.1.0
 packaging==23.1
 platformdirs==3.9.1
 pluggy==1.2.0

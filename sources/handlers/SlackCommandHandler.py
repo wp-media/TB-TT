@@ -6,6 +6,7 @@
 from threading import Thread
 from flask import current_app
 from sources.factories.SlackModalFactory import SlackModalFactory
+from sources.handlers.ServerListHandler import ServerListHandler
 
 
 class SlackCommandHandler():
@@ -18,6 +19,7 @@ class SlackCommandHandler():
             The handler instanciates the objects it needed to complete the processing of the request.
         """
         self.slack_modal_factory = SlackModalFactory()
+        self.server_list_handler = ServerListHandler()
 
     def process(self, payload_json):
         """
@@ -27,10 +29,11 @@ class SlackCommandHandler():
 
         # Retrieve the shortcut callback
         command = payload_json['command']
-
         # Process the paylaod according to the callback
         if '/dev-team-escalation' == command:
             self.dev_team_escalation_command_callback(payload_json)
+        elif '/wprocket-ips' == command:
+            self.wp_rocket_ips_command_callback(payload_json)
         else:
             raise ValueError('Unknown command.')
         return {}
@@ -45,4 +48,15 @@ class SlackCommandHandler():
         thread = Thread(
             target=self.slack_modal_factory.dev_team_escalation_modal, kwargs={
                 "app_context": current_app.app_context(), "trigger_id": trigger_id})
+        thread.start()
+
+    def wp_rocket_ips_command_callback(self, payload_json):
+        """
+            Callback method to process the Slack command "/wprocket-ips"
+        """
+        initiator = payload_json["user_id"]
+
+        thread = Thread(
+            target=self.server_list_handler.send_wp_rocket_ips, kwargs={
+                "app_context": current_app.app_context(), "slack_user": initiator})
         thread.start()
