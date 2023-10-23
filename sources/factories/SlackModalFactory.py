@@ -51,7 +51,7 @@ class SlackModalFactory(SlackFactoryAbstract):
             "type": "modal",
             "title": {
                 "type": "plain_text",
-                "text": "Create a Github task"
+                "text": "Escalate to the dev team"
             },
             "blocks": [
                 {
@@ -66,7 +66,25 @@ class SlackModalFactory(SlackFactoryAbstract):
                         "action_id": "task_title",
                         "placeholder": {
                             "type": "plain_text",
-                            "text": "Type in here"
+                            "text": "Escalation title"
+                        },
+                        "multiline": false
+                    },
+                    "optional": false
+                },
+                {
+                    "type": "input",
+                    "block_id": "link_helpscout_block",
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Helpscout ticket link"
+                    },
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "link_helpscout",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Helpscout ticket link"
                         },
                         "multiline": false
                     },
@@ -84,7 +102,7 @@ class SlackModalFactory(SlackFactoryAbstract):
                         "action_id": "task_description",
                         "placeholder": {
                             "type": "plain_text",
-                            "text": "Describe the issue."
+                            "text": "Describe the issue"
                         },
                         "multiline": true
                     },
@@ -102,7 +120,7 @@ class SlackModalFactory(SlackFactoryAbstract):
                         "action_id": "investigation_block",
                         "placeholder": {
                             "type": "plain_text",
-                            "text": "Describe the investigations you already performed."
+                            "text": "Describe the investigations you already performed"
                         },
                         "multiline": true
                     },
@@ -120,11 +138,29 @@ class SlackModalFactory(SlackFactoryAbstract):
                         "action_id": "replication_block",
                         "placeholder": {
                             "type": "plain_text",
-                            "text": "Describe the steps to replicate."
+                            "text": "Describe the steps to replicate"
                         },
                         "multiline": true
                     },
                     "optional": false
+                },
+                {
+                    "type": "input",
+                    "block_id": "link_slack_block",
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Slack discussion link"
+                    },
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "link_slack",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Previous Slack thread"
+                        },
+                        "multiline": false
+                    },
+                    "optional": true
                 }
             ],
             "close": {

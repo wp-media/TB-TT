@@ -36,6 +36,6 @@ def test_dev_team_escalation_modal_retrieve_params():
 
     assert "a" == task_param_uut.title
     # pylint: disable-next=line-too-long
-    assert "Task submitted by mathieu.lamiot through TBTT.\n\n**Description of the issue:**\nb\n\n**Investigation performed:**\nc\n\n**How to reproduce:**\nd\n\n" == task_param_uut.body # noqa
+    assert "Task submitted by mathieu.lamiot through TBTT.\n\n**Description of the issue:**\nb\n\n**Investigation performed:**\nc\n\n**How to reproduce:**\nd\n\nHelpscout link:d\n" == task_param_uut.body # noqa
     assert task_param_uut.handle_immediately
     assert 'dev-team-escalation' == task_param_uut.flow
