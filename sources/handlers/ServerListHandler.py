@@ -3,7 +3,7 @@
 """
 from sources.factories.SlackMessageFactory import SlackMessageFactory
 from sources.factories.OvhApiFactory import OvhApiFactory
-import sources.utils.IpAddress as IpAddress
+from sources.utils import IpAddress
 
 
 class ServerListHandler():
@@ -32,14 +32,16 @@ class ServerListHandler():
         text += "Load CSS Asynchronously:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://cpcss.wp-rocket.me / 46.30.212.116\n"
-        # Defined in k8s_sips: https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
+        # Defined in k8s_sips:
+        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
         text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
         text += "\n"
 
         text += "Remove Unused CSS:\n"
         # SaaS CNAME in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "46.30.212.106\n"
-        # Defined in k8s_sips: https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
+        # Defined in k8s_sips:
+        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
         text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
@@ -57,7 +59,8 @@ class ServerListHandler():
 
         text += "RocketCDN subscription:\n"
         text += "https://rocketcdn.me/api/\n"
-        # Defined in k8s_sips: https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
+        # Defined in k8s_sips:
+        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
         text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
 
         self.slack_message_factory.post_message(app_context, slack_user, text)

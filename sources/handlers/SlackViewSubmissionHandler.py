@@ -90,7 +90,6 @@ class SlackViewSubmissionHandler():
             The parameters of the task are extracted from the modal payload. A thread is started to generate the Github task.
         """
         task_params = self.dev_team_escalation_modal_retrieve_params(payload_json)
-
         thread = Thread(target=self.github_task_handler.init_github_task, kwargs={
             "app_context": current_app.app_context(), "task_params": task_params})
         thread.start()
@@ -109,12 +108,17 @@ class SlackViewSubmissionHandler():
         description_input = modal_values['description_block']['task_description']['value']
         investigation_input = modal_values['investigation_block']['investigation_block']['value']
         replication_input = modal_values['replication_block']['replication_block']['value']
+        helpscout_link = modal_values['link_helpscout_block']['link_helpscout']['value']
+        slack_link = modal_values['link_slack_block']['link_slack']['value']
         user_name = payload_json["user"]["name"]
         body = (f"Task submitted by {user_name} through TBTT.\n\n"
                 f"**Description of the issue:**\n{description_input}\n\n"
                 f"**Investigation performed:**\n{investigation_input}\n\n"
                 f"**How to reproduce:**\n{replication_input}\n\n"
+                f"Helpscout link:{helpscout_link}\n"
                 )
+        if slack_link is not None:
+            body += f"Slack link:{slack_link}\n"
 
         # Initiator of the request
         initiator = payload_json["user"]["id"]

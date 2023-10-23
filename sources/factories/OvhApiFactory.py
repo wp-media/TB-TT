@@ -2,9 +2,9 @@
     This module defines the factory for OVH API
 """
 from flask import current_app
-import sources.utils.IpAddress as IpAddress
-import sources.utils.Constants as cst
 import ovh
+from sources.utils import IpAddress
+import sources.utils.Constants as cst
 
 
 class OvhApiFactory():
@@ -57,8 +57,8 @@ class OvhApiFactory():
         """
         client = self._get_ovh_client(app_context)
         raw_result = client.get(f'/dedicated/server/{server_name}/ips')
-        result = dict()
-        for ip in raw_result:
-            ip_split = ip.split("/")
-            result[IpAddress.validIPAddress(ip_split[0])] = ip
+        result = {}
+        for server_ip in raw_result:
+            ip_split = server_ip.split("/")
+            result[IpAddress.valid_ip_address(ip_split[0])] = server_ip
         return result
