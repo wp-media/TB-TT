@@ -16,27 +16,38 @@ class OvhApiFactory():
         """
             The factory instanciates the objects it needed to complete the processing of the request.
         """
-        self.client = ovh.Client(
-            endpoint='ovh-eu',               # Endpoint of API OVH Europe (List of available endpoints)
-            application_key=current_app.config[cst.APP_CONFIG_TOKEN_OVH_APP_KEY],
-            application_secret=current_app.config[cst.APP_CONFIG_TOKEN_OVH_APP_SECRET],
-            consumer_key=current_app.config[cst.APP_CONFIG_TOKEN_OVH_CONSUMER_KEY],
-        )
+        self.client = None
+
+    def _get_ovh_client(self, app_context):
+        """
+            Return the ovh client and creates it if needed
+        """
+        if self.client is None:
+            app_context.push()
+            self.client = ovh.Client(
+                endpoint='ovh-eu',               # Endpoint of API OVH Europe (List of available endpoints)
+                application_key=current_app.config[cst.APP_CONFIG_TOKEN_OVH_APP_KEY],
+                application_secret=current_app.config[cst.APP_CONFIG_TOKEN_OVH_APP_SECRET],
+                consumer_key=current_app.config[cst.APP_CONFIG_TOKEN_OVH_CONSUMER_KEY],
+            )
+        return self.client
 
     def get_dedicated_servers(self, app_context):
         """
             Retrieves the list of dedicated servers available
         """
-        result = self.client.get('/dedicated/server', iamTags=None)
+        client = self._get_ovh_client(app_context)
+        result = client.get('/dedicated/server', iamTags=None)
         return result
 
     def get_dedicated_server_display_name(self, app_context, server_name):
         """
             Returns display_name of the dedicated server.
         """
-        service_info = self.client.get(f'/dedicated/server/{server_name}/serviceInfos')
+        client = self._get_ovh_client(app_context)
+        service_info = client.get(f'/dedicated/server/{server_name}/serviceInfos')
         service_id = service_info["serviceId"]
-        service = self.client.get(f'/service/{service_id}')
+        service = client.get(f'/service/{service_id}')
         display_name = service["resource"]["displayName"]
         return display_name
 
@@ -44,8 +55,8 @@ class OvhApiFactory():
         """
             Return the IPv6 and IPv4 of a dedicated server
         """
-        raw_result = self.client.get(f'/dedicated/server/{server_name}/ips')
-        print(raw_result)
+        client = self._get_ovh_client(app_context)
+        raw_result = client.get(f'/dedicated/server/{server_name}/ips')
         result = dict()
         for ip in raw_result:
             ip_split = ip.split("/")

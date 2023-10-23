@@ -45,7 +45,6 @@ class ServerListHandler():
             display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
             if 'worker' in display_name:
                 server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
-                print(server_ips)
                 text += server_ips[IpAddress.IP_ADDRESS_IPV4] + " / " + server_ips[IpAddress.IP_ADDRESS_IPV6] + "\n"
         text += "\n"
 
