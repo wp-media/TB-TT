@@ -37,6 +37,8 @@ class ServerListHandler():
         text += "\n"
 
         text += "Remove Unused CSS:\n"
+        # SaaS CNAME in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
+        text += "46.30.212.106\n"
         # Defined in k8s_sips: https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
         text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
         # OVH servers

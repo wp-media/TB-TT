@@ -45,6 +45,7 @@ class SlackCommandHandler():
         """
         trigger_id = payload_json['trigger_id']
 
+        current_app.logger.info("dev_team_escalation_command_callback: Starting processing thread...")
         thread = Thread(
             target=self.slack_modal_factory.dev_team_escalation_modal, kwargs={
                 "app_context": current_app.app_context(), "trigger_id": trigger_id})
@@ -56,6 +57,7 @@ class SlackCommandHandler():
         """
         initiator = payload_json["user_id"]
 
+        current_app.logger.info("wp_rocket_ips_command_callback: Starting processing thread...")
         thread = Thread(
             target=self.server_list_handler.send_wp_rocket_ips, kwargs={
                 "app_context": current_app.app_context(), "slack_user": initiator})
