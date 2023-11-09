@@ -34,6 +34,8 @@ class SlackCommandHandler():
             self.dev_team_escalation_command_callback(payload_json)
         elif '/wprocket-ips' == command:
             self.wp_rocket_ips_command_callback(payload_json)
+        elif '/deploy-manager' == command:
+            self.deploy_manager_command_callback(payload_json)
         else:
             raise ValueError('Unknown command.')
         return {}
@@ -61,4 +63,16 @@ class SlackCommandHandler():
         thread = Thread(
             target=self.server_list_handler.send_wp_rocket_ips, kwargs={
                 "app_context": current_app.app_context(), "slack_user": initiator})
+        thread.start()
+
+    def deploy_manager_command_callback(self, payload_json):
+        """
+            Callback method to process the Slack command "/deploy-manager"
+        """
+        trigger_id = payload_json['trigger_id']
+
+        current_app.logger.info("deploy_manager_command_callback: Starting processing thread...")
+        thread = Thread(
+            target=self.slack_modal_factory.deploy_manager_modal, kwargs={
+                "app_context": current_app.app_context(), "trigger_id": trigger_id})
         thread.start()

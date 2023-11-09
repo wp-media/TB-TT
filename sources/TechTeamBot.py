@@ -45,6 +45,7 @@ class TechTeamBot(FlaskAppWrapper):
         self.__load_key("TBTT_OVH_APP_KEY", cst.APP_CONFIG_TOKEN_OVH_APP_KEY)
         self.__load_key("TBTT_OVH_APP_SECRET", cst.APP_CONFIG_TOKEN_OVH_APP_SECRET)
         self.__load_key("TBTT_OVH_CONSUMER_KEY", cst.APP_CONFIG_TOKEN_OVH_CONSUMER_KEY)
+        self.__load_key("TBTT_GODP_AUTH_TOKEN", cst.APP_CONFIG_TOKEN_GODP_AUTH_TOKEN)
 
     def __setup_slack_interaction_endpoint(self):
         """
