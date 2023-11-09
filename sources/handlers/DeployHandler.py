@@ -19,7 +19,7 @@ class DeployHandler():
             The handler instanciates the objects it needed to complete the processing of the request.
         """
         self.__godp_token = None
-        self.godp_deploy_url = "https://godp.wp-media.me//v1/deploy"
+        self.godp_deploy_url = "https://godp.wp-media.me/v1/deploy"
 
     def _get_godp_token(self, app_context):
         """
