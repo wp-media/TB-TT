@@ -1,0 +1,11 @@
+{
+    "appList": {
+        "Imagify App": "wpm-imagify-app",
+        "SaaS RUCSS": "wpm-rucss"
+    },
+    "envList": {
+        "staging": "staging",
+        "test": "test",
+        "next": "next"
+    }
+}

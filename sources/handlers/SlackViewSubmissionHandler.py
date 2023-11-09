@@ -5,7 +5,9 @@
 from threading import Thread
 from flask import current_app
 from sources.handlers.GithubTaskHandler import GithubTaskHandler
+from sources.handlers.DeployHandler import DeployHandler
 from sources.models.InitGithubTaskParam import InitGithubTaskParam
+from sources.models.DeployHandlerParam import DeployHandlerParam
 
 
 class SlackViewSubmissionHandler():
@@ -18,6 +20,7 @@ class SlackViewSubmissionHandler():
             The handler instanciates the objects it needed to complete the processing of the request.
         """
         self.github_task_handler = GithubTaskHandler()
+        self.deployment_handler = DeployHandler()
 
     def process(self, payload_json):
         """
@@ -32,6 +35,8 @@ class SlackViewSubmissionHandler():
             self.create_github_task_modal_submit_callback(payload_json)
         elif 'ttl_dev_team_escalation_modal_submit' == callback:
             self.dev_team_escalation_modal_submit_callback(payload_json)
+        elif 'ttl_deploy_manager_modal_submit' == callback:
+            self.deploy_manager_submit_callback(payload_json)
         else:
             raise ValueError('Unknown modal callback.')
         return {"response_action": "clear"}
@@ -125,5 +130,39 @@ class SlackViewSubmissionHandler():
 
         task_params = InitGithubTaskParam(title, body, handle_immediately=True,
                                           initiator=initiator, flow='dev-team-escalation')
+
+        return task_params
+
+    def deploy_manager_submit_callback(self, payload_json):
+        """
+            Callback method to process a submitted modal "Deployment manager".
+            The parameters of the task are extracted from the modal payload. A thread is started to deploy the app.
+        """
+        task_params = self.deploy_manager_modal_retrieve_params(payload_json)
+        thread = Thread(target=self.deployment_handler.deploy_commit, kwargs={
+            "app_context": current_app.app_context(), "task_params": task_params})
+        thread.start()
+
+    def deploy_manager_modal_retrieve_params(self, payload_json):
+        """
+            This method extract the github task parameters from a submitted Slack modal "Deployment Manager".
+            Only the parameters found in the payload are set.
+        """
+        modal_values = payload_json["view"]["state"]["values"]
+
+        # App component
+        keys = list(dict.keys(modal_values['app_block']))
+        selected_option = modal_values['app_block'][keys[0]]['selected_option']
+        app = selected_option['value']
+
+        # Env component
+        keys = list(dict.keys(modal_values['env_block']))
+        selected_option = modal_values['env_block'][keys[0]]['selected_option']
+        env = selected_option['value']
+
+        # Commit sha component
+        commit = modal_values['sha_block']['sha_text']['value']
+
+        task_params = DeployHandlerParam(app, env, commit)
 
         return task_params
