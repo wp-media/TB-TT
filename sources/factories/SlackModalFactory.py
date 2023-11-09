@@ -17,6 +17,7 @@ class SlackModalFactory(SlackFactoryAbstract):
         self.open_view_url = 'https://slack.com/api/views.open'
         self.__assignee_list = None
         self.__app_list = None
+        self.__env_list = None
 
     def __get_assignee_list(self):
         """
@@ -67,20 +68,20 @@ class SlackModalFactory(SlackFactoryAbstract):
         """
             Generate the list of options for the drop-down select of environments, from the apps.json config file.
         """
-        if self.__app_list is None:
-            self.__app_list = []
+        if self.__env_list is None:
+            self.__env_list = []
             with open(Path(__file__).parent.parent.parent / "config" / "apps.json", encoding='utf-8') as file_apps_config:
                 apps_config = json.load(file_apps_config)
             if "envList" in apps_config:
                 for key, value in apps_config["envList"].items():
-                    self.__app_list.append({
+                    self.__env_list.append({
                                                     "text": {
                                                         "type": "plain_text",
                                                         "text": key
                                                     },
                                                     "value": value
                                                 })
-        return self.__app_list
+        return self.__env_list
 
     def dev_team_escalation_modal(self, app_context, trigger_id):
         """
