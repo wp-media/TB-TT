@@ -1,11 +1,13 @@
 {
     "appList": {
         "Imagify App": "wpm-imagify-app",
-        "SaaS RUCSS": "wpm-rucss"
+        "SaaS RUCSS": "wpm-rucss",
+        "Monies": "wpm-monies",
+        "RocketCDN App": "wpm-rocketcdn-app"
     },
     "envList": {
         "staging": "staging",
-        "test": "test",
-        "next": "next"
+        "next": "next",
+        "test": "test"
     }
 }
