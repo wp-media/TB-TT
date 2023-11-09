@@ -40,8 +40,8 @@ class DeployHandler():
         request_payload['environment'] = task_params.env
         request_payload['ref'] = task_params.commit
 
-        current_app.logger.info("deploy_commit: Requesting a deployment:/n" +
-                                json.dumps(request_payload) + "/n" +
+        current_app.logger.info("deploy_commit: Requesting a deployment:\n" +
+                                json.dumps(request_payload) + "\n" +
                                 json.dumps(request_header))
         result = requests.post(url=self.godp_deploy_url,
                                headers=request_header,
@@ -50,8 +50,4 @@ class DeployHandler():
             current_app.logger.error("deploy_commit: GODP call failed.")
             raise ValueError('GODP call failed.')
         result_json = result.json()
-        if result_json["url"]:
-            current_app.logger.info("deploy_commit: GODP Response:/n" + result_json)
-        else:
-            current_app.logger.error("deploy_commit: GODP did not return a deploy URL.")
-            raise ValueError('GODP did not return a deploy URL.')
+        current_app.logger.info("deploy_commit: GODP Response:\n" + result_json)
