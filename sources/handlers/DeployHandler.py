@@ -31,21 +31,24 @@ class DeployHandler():
         return self.__godp_token
 
     def deploy_commit(self, app_context, task_params: DeployHandlerParam):
+        app_context.push()
         request_header = {"Content-type": "application/json",
                           "Authorization": "Bearer " + self._get_godp_token(app_context)}
         request_payload = {}
         request_payload['application'] = task_params.app
         request_payload['environment'] = task_params.env
         request_payload['ref'] = task_params.commit
-        print(request_payload)
-        print(request_header)
+
+        current_app.logger.info("deploy_commit: Requesting a deployment:/n" + request_payload + "/n" + request_header)
         result = requests.post(url=self.godp_deploy_url,
                                headers=request_header,
                                json=request_payload, timeout=3000)
         if result is None:
+            current_app.logger.error("deploy_commit: GODP call failed.")
             raise ValueError('GODP call failed.')
         result_json = result.json()
         if result_json["url"]:
-            print("GODP response: " + result_json)
+            current_app.logger.info("deploy_commit: GODP Response:/n" + result_json)
         else:
+            current_app.logger.error("deploy_commit: GODP did not return a deploy URL.")
             raise ValueError('GODP did not return a deploy URL.')
