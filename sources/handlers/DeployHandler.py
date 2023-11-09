@@ -18,6 +18,7 @@ class DeployHandler():
             The handler instanciates the objects it needed to complete the processing of the request.
         """
         self.__godp_token = None
+        self.godp_deploy_url = "https://godp.wp-media.me//v1/deploy"
 
     def _get_godp_token(self, app_context):
         """
@@ -38,7 +39,7 @@ class DeployHandler():
         request_payload['ref'] = task_params.commit
         print(request_payload)
         print(request_header)
-        result = requests.post(url=self.post_message_url,
+        result = requests.post(url=self.godp_deploy_url,
                                headers=request_header,
                                json=request_payload, timeout=3000)
         if result is None:
