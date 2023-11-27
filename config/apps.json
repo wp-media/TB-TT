@@ -8,6 +8,7 @@
     "envList": {
         "staging": "staging",
         "next": "next",
-        "test": "test"
+        "test": "test",
+        "mirror": "mirror"
     }
 }
