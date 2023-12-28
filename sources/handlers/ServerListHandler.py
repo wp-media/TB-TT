@@ -18,9 +18,9 @@ class ServerListHandler():
         self.slack_message_factory = SlackMessageFactory()
         self.ovh_api_factory = OvhApiFactory()
 
-    def send_wp_rocket_ips(self, app_context, slack_user):
+    def generate_wp_rocket_ips(self, app_context):
         """
-            List all IPs used for WP Rocket and sends it in a Slack DM
+            Generates a text list of all IPs used by WP Rocket
         """
         text = "List of IPs used for WP Rocket:\n\n"
 
@@ -72,4 +72,11 @@ class ServerListHandler():
         # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
         text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
 
+        return text
+
+    def send_wp_rocket_ips_to_slack(self, app_context, slack_user):
+        """
+            List all IPs used for WP Rocket and sends it in a Slack DM
+        """
+        text = self.generate_wp_rocket_ips(app_context)
         self.slack_message_factory.post_message(app_context, slack_user, text)
