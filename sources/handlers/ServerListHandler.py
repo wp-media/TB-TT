@@ -26,12 +26,14 @@ class ServerListHandler():
 
         text += "License validation/activation, update check, plugin information:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
-        text += "https://wp-rocket.me / 185.10.9.101\n"
+        text += "https://wp-rocket.me\n"
+        text += "185.10.9.101\n"
         text += "\n"
 
         text += "Load CSS Asynchronously:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
-        text += "https://cpcss.wp-rocket.me / 46.30.212.116\n"
+        text += "https://cpcss.wp-rocket.me\n"
+        text += "46.30.212.116\n"
         # Defined in k8s_sips:
         # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
         text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
@@ -45,20 +47,27 @@ class ServerListHandler():
         text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
+        ovh_ipv4 = ''
+        ovh_ipv6 = ''
         for server_name in all_server_list:
             display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
             if 'worker' in display_name:
                 server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
-                text += server_ips[IpAddress.IP_ADDRESS_IPV4] + " / " + server_ips[IpAddress.IP_ADDRESS_IPV6] + "\n"
+                ovh_ipv4 += server_ips[IpAddress.IP_ADDRESS_IPV4] + "\n"
+                ovh_ipv6 += server_ips[IpAddress.IP_ADDRESS_IPV6] + "\n"
+        text += ovh_ipv4
+        text += ovh_ipv6
         text += "\n"
 
         text += "Dynamic exclusions and inclusions:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
-        text += "https://b.rucss.wp-rocket.me / 46.30.212.116\n"
+        text += "https://b.rucss.wp-rocket.me\n"
+        text += "46.30.212.116\n"
         text += "\n"
 
         text += "RocketCDN subscription:\n"
-        text += "https://rocketcdn.me/api/ / 185.10.9.100\n"
+        text += "https://rocketcdn.me/api/\n"
+        text += "185.10.9.100\n"
         # Defined in k8s_sips:
         # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
         text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
