@@ -61,7 +61,7 @@ class SlackCommandHandler():
 
         current_app.logger.info("wp_rocket_ips_command_callback: Starting processing thread...")
         thread = Thread(
-            target=self.server_list_handler.send_wp_rocket_ips, kwargs={
+            target=self.server_list_handler.send_wp_rocket_ips_to_slack, kwargs={
                 "app_context": current_app.app_context(), "slack_user": initiator})
         thread.start()
 
