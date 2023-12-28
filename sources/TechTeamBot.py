@@ -9,6 +9,7 @@ from sources.FlaskAppWrapper import FlaskAppWrapper
 from sources.listeners.SlackInteractionListener import SlackInteractionListener
 from sources.listeners.SlackCommandListener import SlackCommandListener
 from sources.listeners.GithubWebhookListener import GithubWebhookListener
+from sources.listeners.SupportListener import SupportListener
 import sources.utils.Constants as cst
 
 
@@ -69,6 +70,14 @@ class TechTeamBot(FlaskAppWrapper):
         github_webhook_endpoint = GithubWebhookListener()
         self.add_endpoint("/github/webhook", endpoint_name='github_webhook', handler=github_webhook_endpoint, methods=['POST'])
 
+    def __setup_support_enpoints(self):
+        """
+            Creates the endpoints for the Support team
+        """
+        support_listener = SupportListener()
+        self.add_endpoint("/support/wprocket-ips", endpoint_name='support_wprocket_ips',
+                          handler=support_listener.get_wprocket_ips, methods=['GET'])
+
     def __load_config(self):
         with open(Path(__file__).parent.parent / "config" / "app.json", encoding='utf-8') as file_app_config:
             self.__app_config = json.load(file_app_config)
@@ -82,6 +91,7 @@ class TechTeamBot(FlaskAppWrapper):
         self.__setup_slack_interaction_endpoint()
         self.__setup_slack_command_endpoint()
         self.__setup_github_webhook_endpoint()
+        self.__setup_support_enpoints()
 
     def run(self, **kwargs):
         self.app.run(port=self.__app_config['port'], **kwargs)
