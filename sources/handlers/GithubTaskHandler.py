@@ -160,4 +160,4 @@ class GithubTaskHandler():
                                                   slack_thread["channel"]["id"], slack_thread["ts"], thread_response)
         else:
             app_context.push()
-            current_app.logger.info("dev_team_escalation_update: Nex message identical to the current one.")
+            current_app.logger.info("dev_team_escalation_update: Next message identical to the current one.")

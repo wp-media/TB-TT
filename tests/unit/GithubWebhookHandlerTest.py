@@ -20,7 +20,7 @@ def test_process_project_item_v2_assignee_update(mock_thread_start):
         "projects_v2_item": {
             "id": 37263884,
             "node_id": "PVTI_lADOAMEyYM4ASOQZzgI4mgw",
-            "project_node_id": "PVT_kwDOAMEyYM4ASOQZ",
+            "project_node_id": "PVT_kwDOAMEyYM4AaLeb",
             "content_node_id": "DI_lADOAMEyYM4ASOQZzgDzxWE",
             "content_type": "DraftIssue",
             "creator": {
@@ -105,7 +105,7 @@ def test_process_project_item_v2_status_update(mock_thread_start):
         "projects_v2_item": {
             "id": 37263884,
             "node_id": "PVTI_lADOAMEyYM4ASOQZzgI4mgw",
-            "project_node_id": "PVT_kwDOAMEyYM4ASOQZ",
+            "project_node_id": "PVT_kwDOAMEyYM4AaLeb",
             "content_node_id": "DI_lADOAMEyYM4ASOQZzgDzxWE",
             "content_type": "DraftIssue",
             "creator": {
@@ -134,7 +134,7 @@ def test_process_project_item_v2_status_update(mock_thread_start):
         },
         "changes": {
             "field_value": {
-                "field_node_id": "PVTSSF_lADOAMEyYM4ASOQZzgLoyz8",
+                "field_node_id": "PVTSSF_lADOAMEyYM4AaLebzgQxzGc",
                 "field_type": "single_select"
             }
         },
