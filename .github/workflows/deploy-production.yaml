@@ -21,6 +21,19 @@ jobs:
           ref: master
           token: ${{ secrets.DEPLOY_ACTION_PAT }}
           path: ./.github/actions/group.one-deploy-action
+      - name: Create date release tag
+        id: create_tag
+        run: echo ::set-output name=VERSION::$(echo $(date '+%Y.%m.%d-%H%M'))
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          name: ${{ steps.create_tag.outputs.VERSION }}
+          tag_name: v${{ steps.create_tag.outputs.VERSION }}
+          body: ${{ github.event.head_commit.message }}
+          target_commitish: master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
       - name: Deploy to production
         id: deploy
         uses: ./.github/actions/group.one-deploy-action/
