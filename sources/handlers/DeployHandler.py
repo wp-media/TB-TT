@@ -2,9 +2,9 @@
     This module defines the handler for deployment with the group.One Deploy Proxy
     This handler is just a API call factory, as there is no special business logic.
 """
+import json
 import requests
 from flask import current_app
-import json
 import sources.utils.Constants as cst
 from sources.models.DeployHandlerParam import DeployHandlerParam
 
@@ -32,6 +32,9 @@ class DeployHandler():
         return self.__godp_token
 
     def deploy_commit(self, app_context, task_params: DeployHandlerParam):
+        """
+            Triggers a deployment by calling the GODP API endpoint
+        """
         app_context.push()
         request_header = {"Content-type": "application/json",
                           "Authorization": "Bearer " + self._get_godp_token(app_context)}

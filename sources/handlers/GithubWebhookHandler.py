@@ -6,6 +6,8 @@ from threading import Thread
 from pathlib import Path
 from flask import current_app
 from sources.handlers.GithubTaskHandler import GithubTaskHandler
+from sources.handlers.GithubReleaseHandler import GithubReleaseHandler
+from sources.models.GithubReleaseParam import GithubReleaseParam
 
 
 class GithubWebhookHandler():
@@ -18,6 +20,7 @@ class GithubWebhookHandler():
             The handler instanciates the objects it needed to complete the processing of the request.
         """
         self.github_project_item_handler = GithubTaskHandler()
+        self.github_release_handler = GithubReleaseHandler()
         with open(Path(__file__).parent.parent.parent / "config" / "github.json", encoding='utf-8') as file_github_config:
             self.github_config = json.load(file_github_config)
 
@@ -28,6 +31,8 @@ class GithubWebhookHandler():
         """
         if "projects_v2_item" in payload_json:
             self.project_v2_item_update_callback(payload_json)
+        elif "release" in payload_json:
+            self.release_callback(payload_json)
         else:
             raise ValueError('Unknown webhook payload.')
         return {}
@@ -52,4 +57,29 @@ class GithubWebhookHandler():
         thread = Thread(target=self.github_project_item_handler.process_update, kwargs={
             "app_context": current_app.app_context(), "node_id": node_id})
         current_app.logger.info("project_v2_item_update_callback: Starting processing thread...")
+        thread.start()
+
+    def release_callback(self, payload_json):
+        """
+            Callback for webhooks linked to a Github release.
+            Filter out irrelevant webhooks.
+            Retrieve the relevant data in paylaod and start a thread for further processing
+        """
+        # Keep only released actions
+        if "action" not in payload_json or "released" != payload_json["action"]:
+            current_app.logger.info("release_callback: Not a released release action.")
+            return
+        # Keep only changes on status or assignees
+        repository_name = payload_json["repository"]["name"]
+        if repository_name not in self.github_config["repoNameToReadable"]:
+            current_app.logger.info("release_callback: Release not linked to a tracked repository.")
+            return
+
+        version = payload_json["release"]["tag_name"]
+        body = payload_json["release"]["body"]
+
+        release_params = GithubReleaseParam(repository_name, version, body)
+        thread = Thread(target=self.github_release_handler.process_release, kwargs={
+            "app_context": current_app.app_context(), "release_params": release_params})
+        current_app.logger.info("release_callback: Starting processing thread...")
         thread.start()
