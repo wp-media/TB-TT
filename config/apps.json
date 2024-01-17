@@ -3,12 +3,17 @@
         "Imagify App": "wpm-imagify-app",
         "SaaS RUCSS": "wpm-rucss",
         "Monies": "wpm-monies",
-        "RocketCDN App": "wpm-rocketcdn-app"
+        "RocketCDN App": "wpm-rocketcdn-app",
+        "wp-rocket.me": "wpm-wprocket",
+        "Imagify Website": "wpm-imagify-website",
+        "RocketCDN Website": "wpm-rocketcdn-website"
     },
     "envList": {
         "staging": "staging",
         "next": "next",
         "test": "test",
-        "mirror": "mirror"
+        "mirror": "mirror",
+        "sandbox 1": "sandbox1",
+        "sandbox 2": "sandbox2"
     }
 }
