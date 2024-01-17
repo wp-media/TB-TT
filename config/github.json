@@ -26,7 +26,10 @@
         "saas-director": "SaaS Director",
         "monies": "Monies",
         "imagify": "Imagify app",
-        "rocket-cdn": "RocketCDN"
+        "rocket-cdn": "RocketCDN",
+        "wp-rocket.me": "WP Rocket website",
+        "imagify-website": "Imagify website",
+        "rocketcdn-website": "RocketCDN website"
 
     }
 }
