@@ -24,7 +24,7 @@ class SlackMessageFactory(SlackFactoryAbstract):
         self.update_message_url = 'https://slack.com/api/chat.update'
         self.search_message_url = 'https://slack.com/api/search.messages'
 
-    def post_message(self, app_context, channel, text):
+    def post_message(self, app_context, channel, text, blocks=None):
         """
             Sends a message 'text' to the 'channel' as the app.
         """
@@ -33,6 +33,10 @@ class SlackMessageFactory(SlackFactoryAbstract):
         request_open_view_payload = {}
         request_open_view_payload['channel'] = channel
         request_open_view_payload['text'] = text
+
+        if blocks is not None:
+            request_open_view_payload['blocks'] = blocks
+
         result = requests.post(url=self.post_message_url,
                                headers=request_open_view_header,
                                json=request_open_view_payload, timeout=3000)
@@ -99,4 +103,43 @@ class SlackMessageFactory(SlackFactoryAbstract):
         """
         if 'dev-team-escalation' == flow:
             return self.slack_config["dev-team-escalation-channel"]
+        if 'engineering-service-team' == flow:
+            return self.slack_config["engineering-service-team-channel"]
+        if 'releases' == flow:
+            return self.slack_config["release-channel"]
+        if 'ops' == flow:
+            return self.slack_config["ops-channel"]
         raise ValueError('Unknown flow for get_channel.')
+
+    def get_release_note_review_blocks(self, text):
+        """
+            Build the interactive messages for the release note publication flow
+        """
+        blocks = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "plain_text",
+                    "text": text,
+                    "emoji": True
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Publish the release note in the release channel?"
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Yes!",
+                        "emoji": True
+                    },
+                    "value": text,
+                    "action_id": "publish-release-note"
+                }
+            }
+        ]
+        return blocks

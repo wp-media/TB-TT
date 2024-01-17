@@ -8,6 +8,7 @@ from flask_slacksigauth import slack_sig_auth
 from flask import request
 from sources.handlers.SlackShortcutHandler import SlackShortcutHandler
 from sources.handlers.SlackViewSubmissionHandler import SlackViewSubmissionHandler
+from sources.handlers.SlackBlockActionHandler import SlackBlockActionHandler
 
 
 class SlackInteractionListener():
@@ -21,6 +22,7 @@ class SlackInteractionListener():
         """
         self.slack_shortcut_handler = SlackShortcutHandler()
         self.slack_view_submission_handler = SlackViewSubmissionHandler()
+        self.slack_block_action_handler = SlackBlockActionHandler()
 
     @slack_sig_auth
     def __call__(self):
@@ -42,6 +44,8 @@ class SlackInteractionListener():
                 response_payload = self.slack_view_submission_handler.process(payload_json)
             elif 'shortcut' == payload_type:
                 response_payload = self.slack_shortcut_handler.process(payload_json)
+            elif 'block_actions' == payload_type:
+                response_payload = self.slack_block_action_handler.process(payload_json)
             else:
                 raise ValueError('Unknown payload type.')
         except ValueError as error:
