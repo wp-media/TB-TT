@@ -40,5 +40,5 @@ class SlackBlockActionHandler():
             The action value should be sent as a message to the release channel.
         """
         self.slack_message_factory.post_message(current_app.app_context(),
-                                                self.slack_message_factory.get_channel('release'),
+                                                self.slack_message_factory.get_channel('releases'),
                                                 payload_json['action']['value'])

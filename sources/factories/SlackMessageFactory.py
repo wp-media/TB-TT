@@ -105,8 +105,10 @@ class SlackMessageFactory(SlackFactoryAbstract):
             return self.slack_config["dev-team-escalation-channel"]
         if 'engineering-service-team' == flow:
             return self.slack_config["engineering-service-team-channel"]
-        if 'release' == flow:
+        if 'releases' == flow:
             return self.slack_config["release-channel"]
+        if 'ops' == flow:
+            return self.slack_config["ops-channel"]
         raise ValueError('Unknown flow for get_channel.')
 
     def get_release_note_review_blocks(self, text):

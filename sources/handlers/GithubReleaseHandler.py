@@ -38,5 +38,5 @@ class GithubReleaseHandler():
         blocks = self.slack_message_factory.get_release_note_review_blocks(text)
 
         self.slack_message_factory.post_message(app_context,
-                                                self.slack_message_factory.get_channel('engineering-service-team'),
+                                                self.slack_message_factory.get_channel('ops'),
                                                 text, blocks)
