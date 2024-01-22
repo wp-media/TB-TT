@@ -120,8 +120,7 @@ class SlackMessageFactory(SlackFactoryAbstract):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": text,
-                    "emoji": True
+                    "text": text
                 }
             },
             {
