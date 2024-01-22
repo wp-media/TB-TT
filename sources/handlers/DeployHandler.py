@@ -43,9 +43,6 @@ class DeployHandler():
         request_payload['environment'] = task_params.env
         request_payload['ref'] = task_params.commit
 
-        current_app.logger.info("deploy_commit: Requesting a deployment:\n" +
-                                json.dumps(request_payload) + "\n" +
-                                json.dumps(request_header))
         result = requests.post(url=self.godp_deploy_url,
                                headers=request_header,
                                json=request_payload, timeout=3000)
