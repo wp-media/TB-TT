@@ -25,7 +25,7 @@ class SlackBlockActionHandler():
         """
 
         # Retrieve the shortcut callback
-        callback = payload_json['actions']['action_id']
+        callback = payload_json['actions'][0]['action_id']
 
         # Process the paylaod according to the callback
         if 'publish-release-note' == callback:
@@ -42,4 +42,4 @@ class SlackBlockActionHandler():
         """
         self.slack_message_factory.post_message(current_app.app_context(),
                                                 self.slack_message_factory.get_channel('releases'),
-                                                payload_json['actions']['value'])
+                                                payload_json['actions'][0]['value'])

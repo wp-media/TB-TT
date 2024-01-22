@@ -59,7 +59,8 @@ class NotionFactory():
         if response.status_code != 200:
             raise ValueError('Notion API could not create the DB row.')
         page_id = response.json().get('id')
-        page_url = f'https://www.notion.so/{page_id}'
+        page_id_linkable = page_id.replace('-', '')
+        page_url = f'https://www.notion.so/wpmedia/{page_id_linkable}'
         return page_url
 
     def create_release_note(self, app_context, release_params: GithubReleaseParam):
