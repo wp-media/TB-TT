@@ -35,7 +35,7 @@ class SlackInteractionListener():
 
         # Retrieve the payload of the POST request
         payload_json = json.loads(request.form.get('payload'))
-        current_app.logger.info("SlackInteractionListener Payload: " + payload_json)
+        current_app.logger.info("SlackInteractionListener Payload: " + json.dumps(payload_json))
 
         # Route the request to the correct handler
         payload_type = payload_json['type']
