@@ -83,7 +83,7 @@ class NotionFactory():
                     "name": release_params.repository_name
                 }
             },
-            'date_property': {
+            'Release Date': {
                 'date': {
                     'start': today.strftime("%Y-%m-%d")
                 }
