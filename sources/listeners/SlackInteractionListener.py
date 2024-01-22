@@ -5,7 +5,7 @@
 import json
 
 from flask_slacksigauth import slack_sig_auth
-from flask import request
+from flask import request, current_app
 from sources.handlers.SlackShortcutHandler import SlackShortcutHandler
 from sources.handlers.SlackViewSubmissionHandler import SlackViewSubmissionHandler
 from sources.handlers.SlackBlockActionHandler import SlackBlockActionHandler
@@ -35,16 +35,20 @@ class SlackInteractionListener():
 
         # Retrieve the payload of the POST request
         payload_json = json.loads(request.form.get('payload'))
+        current_app.logger.info("SlackInteractionListener Payload: " + payload_json)
 
         # Route the request to the correct handler
         payload_type = payload_json['type']
         response_payload = {}
         try:
             if 'view_submission' == payload_type:
+                current_app.logger.info("SlackInteractionListener: Processing view submission...")
                 response_payload = self.slack_view_submission_handler.process(payload_json)
             elif 'shortcut' == payload_type:
+                current_app.logger.info("SlackInteractionListener: Processing shortcut submission...")
                 response_payload = self.slack_shortcut_handler.process(payload_json)
             elif 'block_actions' == payload_type:
+                current_app.logger.info("SlackInteractionListener: Processing block action submission...")
                 response_payload = self.slack_block_action_handler.process(payload_json)
             else:
                 raise ValueError('Unknown payload type.')

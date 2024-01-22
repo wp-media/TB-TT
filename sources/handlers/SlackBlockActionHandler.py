@@ -29,6 +29,7 @@ class SlackBlockActionHandler():
 
         # Process the paylaod according to the callback
         if 'publish-release-note' == callback:
+            current_app.logger.info("SlackBlockActionHandler: Publish release note callback.")
             self.publish_release_note_callback(payload_json)
         else:
             raise ValueError('Unknown action callback.')
