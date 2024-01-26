@@ -1,0 +1,33 @@
+openapi: 3.0.3
+info:
+  title: TB-TT
+  description: |-
+   This a description from the endpoints from TB-TT service.
+  contact:
+    email: mathieu@wp-media.me
+  version: 1.0.0
+externalDocs:
+  description: Notion Documentation
+  url: https://www.notion.so/wpmedia/TB-TT-137d921c1ff947c4a19e9d0a83262e6a?pvs=4
+servers:
+  - url: https://wpm-tbtt.public-default.live1-k8s-cph3.one.com
+tags:
+  - name: support
+    description: Automation for the support team
+paths:
+  /support/wprocket-ips:
+    post:
+      description: Retrieves the list of servers and IPs used for WP Media products.
+      tags:
+        - support
+      responses:
+        200:
+          description: The list has been correctly retrieved and returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportWPRocketIPsResponse'
+components:
+  schemas:
+    SupportWPRocketIPsResponse:
+      type: string
