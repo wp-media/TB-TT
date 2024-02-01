@@ -32,6 +32,7 @@ jobs:
           tag_name: v${{ steps.create_tag.outputs.VERSION }}
           body: ${{ github.event.head_commit.message }}
           target_commitish: master
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
       - name: Deploy to production
