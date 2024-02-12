@@ -1,0 +1,40 @@
+# PRCHECKLIST generated online at https://mibexsoftware.bitbucket.io/checklist-buddy-editor/
+
++title+ Pull Request  & Code Review Checklists
+  +comment+ # Pull Request author's checklist
+  +comment+ ## Feature validation
+  +task+ I validated all the Acceptance Criteria. If possible, provide sreenshots or videos.
+  +task+ I triggered all changed lines of code at least once without new errors/warnings/notices.
+  +task+ I implemented built-in tests to cover the new/changed code.
+  +comment+ ## Documentation
+  +task+ I prepared the user documentation for the feature/enhancement and shared it in the PR or the GitHub issue.
+  +task+ The user documentation covers new/changed entry points (endpoints, WP hooks, configuration files, ...).
+  +task+ I prepared the technical documentation if needed, and shared it in the PR or the GitHub issue.
+  +comment+ ## Code style
+  +task+ I wrote self-explanatory code about what it does.
+  +task+ I wrote comments to explain why it does it.
+  +task+ I named variables, functions, classes and files explicitely.
+  +task+ I protected entry points against unexpected inputs.
+  +task+ I did not introduce unecessary complexity.
+  +task+ I listed the introduced external dependencies explicitely on the PR.
+  +task+ I validated the repo-specific guidelines from CONTRIBUTING.md.
+  +comment+ ## Observability
+  +task+ I handled errors when needed.
+  +task+ I wrote user-facing messages that are understandable and provide actionable feedbacks.
+  +task+ I prepared ways to observe the implemented system (logs, data, etc.).
+  +comment+ ## Risks
+  +task+ I explicitely mentioned performance risks in the PR.
+  +task+ I explicitely mentioned security risks in the PR.
+  +comment+ # Code Reviewer's checklist
+  +task+ I checked that the CI passed.
+  +task+ I understand how the code solves the issue.
+  +task+ I read the provided user documentation and confirmed it is enough to cover the usage of the code.
+  +task+ I read the provided technical documentation and confirmed it is enough to cover the maintenance of the code.
+  +task+ I easily understand what the code does and how it does it.
+  +task+ I find the naming of variables, functions, classes and files explicit.
+  +task+ I find the code complexity justified.
+  +task+ I find the introduced external dependencies necessary.
+  +task+ I find that the repo-specific guidelines are followed.
+  +task+ I cannot think of a way to break the code.
+  +task+ I find that the mentioned risks are sufficiently mitigated.
+  +task+ I cannot think of any other risks.
