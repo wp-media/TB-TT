@@ -22,13 +22,13 @@ class ServerListHandler():
         """
             Lists all IP used by live2 cluster from group.One
         """
-        text = ''
+        live2_ips = ''
         # Defined in k8s_sips:
         # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
-        text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
-        # Added for live2 according to JIRA: https://group-one.atlassian.net/browse/NET-283
-        text += "46.30.212.70\n46.30.212.71\n46.30.212.72\n46.30.212.73\n"
-        return text
+        live2_ips += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
+        # Added for live2 according to JIRA: https://group-one.atlassian.net/browse/NET-283
+        live2_ips += "46.30.212.70\n46.30.212.71\n46.30.212.72\n46.30.212.73\n"
+        return live2_ips
 
     def generate_wp_rocket_ips(self, app_context):
         """
