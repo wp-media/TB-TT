@@ -18,6 +18,18 @@ class ServerListHandler():
         self.slack_message_factory = SlackMessageFactory()
         self.ovh_api_factory = OvhApiFactory()
 
+    def get_groupone_live2_ips(self):
+        """
+            Lists all IP used by live2 cluster from group.One
+        """
+        text = ''
+        # Defined in k8s_sips:
+        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
+        text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
+        # Added for live2 according to JIRA: https://group-one.atlassian.net/browse/NET-283
+        text += "46.30.212.70\n46.30.212.71\n46.30.212.72\n46.30.212.73\n"
+        return text
+
     def generate_wp_rocket_ips(self, app_context):
         """
             Generates a text list of all IPs used by WP Rocket
@@ -34,17 +46,13 @@ class ServerListHandler():
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://cpcss.wp-rocket.me\n"
         text += "46.30.212.116\n"
-        # Defined in k8s_sips:
-        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
-        text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
+        text += self.get_groupone_live2_ips()
         text += "\n"
 
         text += "Remove Unused CSS:\n"
         # SaaS CNAME in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "46.30.212.106\n"
-        # Defined in k8s_sips:
-        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
-        text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
+        text += self.get_groupone_live2_ips()
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
         ovh_ipv4 = ''
@@ -68,9 +76,7 @@ class ServerListHandler():
         text += "RocketCDN subscription:\n"
         text += "https://rocketcdn.me/api/\n"
         text += "185.10.9.100\n"
-        # Defined in k8s_sips:
-        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
-        text += "46.30.212.64\n46.30.212.65\n46.30.212.66\n46.30.212.67\n46.30.212.68\n46.30.212.69\n46.30.211.85\n"
+        text += self.get_groupone_live2_ips()
 
         return text
 
