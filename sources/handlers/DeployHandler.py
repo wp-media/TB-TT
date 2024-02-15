@@ -2,7 +2,6 @@
     This module defines the handler for deployment with the group.One Deploy Proxy
     This handler is just a API call factory, as there is no special business logic.
 """
-import json
 import requests
 from flask import current_app
 import sources.utils.Constants as cst
@@ -50,4 +49,4 @@ class DeployHandler():
             current_app.logger.error("deploy_commit: GODP call failed.")
             raise ValueError('GODP call failed.')
         result_json = result.json()
-        current_app.logger.info("deploy_commit: GODP Response:\n" + result_json)
+        current_app.logger.info("deploy_commit: GODP Response:\n%s", result_json)
