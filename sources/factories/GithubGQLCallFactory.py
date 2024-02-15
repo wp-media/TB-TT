@@ -44,7 +44,9 @@ class GithubGQLCallFactory():
         """
         github_access_token = self.__get_github_access_token(app_context)
         github_http_transport = RequestsHTTPTransport(
-                url=self.github_gql_url, headers={'Authorization': f'Bearer {github_access_token}'})
+                url=self.github_gql_url, headers={'Authorization': f'Bearer {github_access_token}'},
+                retries=3
+            )
         return github_http_transport
 
     def __get_github_gql_client(self, app_context):
@@ -53,7 +55,7 @@ class GithubGQLCallFactory():
             If it is not created yet, the method creates it before returning.
         """
         github_http_transport = self.__get_github_http_transport(app_context)
-        github_gql_client = gql.Client(transport=github_http_transport, fetch_schema_from_transport=True)
+        github_gql_client = gql.Client(transport=github_http_transport, fetch_schema_from_transport=False)
         return github_gql_client
 
     def __send_gql_request(self, app_context, query, params):
