@@ -77,7 +77,11 @@ class TechTeamBot(FlaskAppWrapper):
         """
         support_listener = SupportListener()
         self.add_endpoint("/support/wprocket-ips", endpoint_name='support_wprocket_ips',
-                          handler=support_listener.get_wprocket_ips, methods=['GET'])
+                          handler=support_listener.get_wprocket_ips_human_readable, methods=['GET'])
+        self.add_endpoint("/support/wprocket-ips/ipv4", endpoint_name='support_wprocket_ipv4',
+                          handler=support_listener.get_wprocket_ipv4_machine_readable, methods=['GET'])
+        self.add_endpoint("/support/wprocket-ips/ipv6", endpoint_name='support_wprocket_ipv6',
+                          handler=support_listener.get_wprocket_ipv6_machine_readable, methods=['GET'])
 
     def __load_config(self):
         with open(Path(__file__).parent.parent / "config" / "app.json", encoding='utf-8') as file_app_config:
