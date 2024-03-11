@@ -65,6 +65,10 @@ class ServerListHandler():
                 ovh_ipv6 += server_ips[IpAddress.IP_ADDRESS_IPV6] + "\n"
         text += ovh_ipv4
         text += ovh_ipv6
+        # SaaS User Agents
+        text += "User Agents:\n"
+        text += "WP-Rocket/SaaS Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36\n"
+        text += "WP-Rocket/SaaS Mozilla/5.0 (Linux; Android 13; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Mobile Safari/537.36\n"
         text += "\n"
 
         text += "Dynamic exclusions and inclusions:\n"
