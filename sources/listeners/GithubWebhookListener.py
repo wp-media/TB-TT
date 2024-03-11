@@ -48,6 +48,7 @@ class GithubWebhookListener():
         response_payload = {}
         try:
             response_payload = self.github_webhook_handler.process(payload_json)
+        # pylint: disable=R0801
         except ValueError as error:
             return str(error), 500
         except KeyError as error:

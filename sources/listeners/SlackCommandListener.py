@@ -34,6 +34,7 @@ class SlackCommandListener():
         response_payload = {}
         try:
             response_payload = self.slack_command_handler.process(payload_json)
+        # pylint: disable=R0801
         except ValueError as error:
             return str(error), 500
         except KeyError as error:
