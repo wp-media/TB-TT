@@ -100,8 +100,10 @@ class ServerListHandler():
         text += ovh_ipv6
         # SaaS User Agents
         text += "User Agents:\n"
-        text += "WP-Rocket/SaaS Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36\n"
-        text += "WP-Rocket/SaaS Mozilla/5.0 (Linux; Android 13; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Mobile Safari/537.36\n"
+        # pylint: disable-next=line-too-long
+        text += "WP-Rocket/SaaS Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36\n" # noqa
+        # pylint: disable-next=line-too-long
+        text += "WP-Rocket/SaaS Mozilla/5.0 (Linux; Android 13; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Mobile Safari/537.36\n" # noqa
         text += "\n"
 
         text += "Dynamic exclusions and inclusions:\n"
