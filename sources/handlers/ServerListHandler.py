@@ -18,7 +18,7 @@ class ServerListHandler():
         self.slack_message_factory = SlackMessageFactory()
         self.ovh_api_factory = OvhApiFactory()
 
-    def get_groupone_live2_ips(self):
+    def get_groupone_live2_ipv4(self):
         """
             Lists all IP used by live2 cluster from group.One
         """
@@ -30,29 +30,62 @@ class ServerListHandler():
         live2_ips += "46.30.212.70\n46.30.212.71\n46.30.212.72\n46.30.212.73\n"
         return live2_ips
 
-    def generate_wp_rocket_ips(self, app_context):
+    def get_groupone_cpcss_ipv4(self):
         """
-            Generates a text list of all IPs used by WP Rocket
+            Lists all IPv4 used specifically by CPCSS service from group.One
+        """
+        ipv4 = ''
+        ipv4 += "46.30.212.116\n"
+        return ipv4
+
+    def get_groupone_saas_ipv4(self):
+        """
+            Lists all IPv4 used specifically by WP Rocket SaaS service from group.One
+        """
+        ipv4 = ''
+        ipv4 += "46.30.212.106\n"
+        return ipv4
+
+    def get_groupone_backend_ipv4(self):
+        """
+            Lists all IPv4 used specifically by backend service from group.One
+        """
+        ipv4 = ''
+        ipv4 += "46.30.212.116\n"
+        return ipv4
+
+    def get_groupone_proxy_ipv4(self):
+        """
+            Lists all IPv4 used for the wpmedia pod proxies
+        """
+        ipv4 = ''
+        ipv4 += "185.10.9.100\n"
+        ipv4 += "185.10.9.101\n"
+        return ipv4
+
+    def generate_wp_rocket_ips_human_readable(self, app_context):
+        """
+            Generates a text list of all IPs used by WP Rocket, human readable
         """
         text = "List of IPs used for WP Rocket:\n\n"
 
         text += "License validation/activation, update check, plugin information:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://wp-rocket.me\n"
-        text += "185.10.9.101\n"
+        text += self.get_groupone_proxy_ipv4()
         text += "\n"
 
         text += "Load CSS Asynchronously:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://cpcss.wp-rocket.me\n"
-        text += "46.30.212.116\n"
-        text += self.get_groupone_live2_ips()
+        text += self.get_groupone_cpcss_ipv4()
+        text += self.get_groupone_live2_ipv4()
         text += "\n"
 
         text += "Remove Unused CSS:\n"
         # SaaS CNAME in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
-        text += "46.30.212.106\n"
-        text += self.get_groupone_live2_ips()
+        text += self.get_groupone_saas_ipv4()
+        text += self.get_groupone_live2_ipv4()
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
         ovh_ipv4 = ''
@@ -74,19 +107,58 @@ class ServerListHandler():
         text += "Dynamic exclusions and inclusions:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://b.rucss.wp-rocket.me\n"
-        text += "46.30.212.116\n"
+        text += self.get_groupone_backend_ipv4()
         text += "\n"
 
         text += "RocketCDN subscription:\n"
         text += "https://rocketcdn.me/api/\n"
-        text += "185.10.9.100\n"
-        text += self.get_groupone_live2_ips()
+        text += self.get_groupone_proxy_ipv4()
+        text += self.get_groupone_live2_ipv4()
 
+        return text
+
+    def generate_wp_rocket_ipv4_machine_readable(self, app_context):
+        """
+            List all IPv4 used for WP Rocket, machine readable with one IP per line and no text
+        """
+        text = ""
+        # group.One
+        text += self.get_groupone_proxy_ipv4()
+        text += self.get_groupone_cpcss_ipv4()
+        text += self.get_groupone_saas_ipv4()
+        text += self.get_groupone_backend_ipv4()
+        text += self.get_groupone_live2_ipv4()
+        # OVH servers
+        all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
+        ovh_ipv4 = ''
+        for server_name in all_server_list:
+            display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
+            if 'worker' in display_name:
+                server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
+                ovh_ipv4 += server_ips[IpAddress.IP_ADDRESS_IPV4] + "\n"
+        text += ovh_ipv4
+        return text
+
+    def generate_wp_rocket_ipv6_machine_readable(self, app_context):
+        """
+            List all IPv6 used for WP Rocket, machine readable with one IP per line and no text
+        """
+        text = ""
+        # group.One
+        # OVH servers
+        all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
+        ovh_ipv6 = ''
+        for server_name in all_server_list:
+            display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
+            if 'worker' in display_name:
+                server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
+                ovh_ipv6 += server_ips[IpAddress.IP_ADDRESS_IPV6] + "\n"
+        text += ovh_ipv6
         return text
 
     def send_wp_rocket_ips_to_slack(self, app_context, slack_user):
         """
             List all IPs used for WP Rocket and sends it in a Slack DM
         """
-        text = self.generate_wp_rocket_ips(app_context)
+        text = self.generate_wp_rocket_ips_human_readable(app_context)
         self.slack_message_factory.post_message(app_context, slack_user, text)
