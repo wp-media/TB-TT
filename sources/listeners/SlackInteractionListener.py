@@ -51,6 +51,7 @@ class SlackInteractionListener():
                 response_payload = self.slack_block_action_handler.process(payload_json)
             else:
                 raise ValueError('Unknown payload type.')
+        # pylint: disable=R0801
         except ValueError as error:
             return str(error), 500
         except KeyError as error:

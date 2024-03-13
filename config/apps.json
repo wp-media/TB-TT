@@ -2,6 +2,7 @@
     "appList": {
         "Imagify App": "wpm-imagify-app",
         "SaaS RUCSS": "wpm-rucss",
+        "SaaS Director": "wpm-saas-director",
         "Monies": "wpm-monies",
         "RocketCDN App": "wpm-rocketcdn-app",
         "wp-rocket.me": "wpm-wprocket",
