@@ -3,7 +3,7 @@
 """
 from sources.factories.SlackMessageFactory import SlackMessageFactory
 from sources.factories.OvhApiFactory import OvhApiFactory
-from sources.utils import IpAddress
+from sources.utils import IpAddress, Duplication
 
 
 class ServerListHandler():
@@ -139,7 +139,8 @@ class ServerListHandler():
                 server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
                 ovh_ipv4 += server_ips[IpAddress.IP_ADDRESS_IPV4] + "\n"
         text += ovh_ipv4
-        return text
+        deduplicated_text = Duplication.remove_duplicated_lines(text)
+        return deduplicated_text
 
     def generate_wp_rocket_ipv6_machine_readable(self, app_context):
         """
@@ -156,7 +157,8 @@ class ServerListHandler():
                 server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
                 ovh_ipv6 += server_ips[IpAddress.IP_ADDRESS_IPV6] + "\n"
         text += ovh_ipv6
-        return text
+        deduplicated_text = Duplication.remove_duplicated_lines(text)
+        return deduplicated_text
 
     def send_wp_rocket_ips_to_slack(self, app_context, slack_user):
         """
