@@ -18,6 +18,16 @@ class ServerListHandler():
         self.slack_message_factory = SlackMessageFactory()
         self.ovh_api_factory = OvhApiFactory()
 
+    def get_groupone_live1_ipv4(self):
+        """
+            Lists all IP used by live1 cluster from group.One
+        """
+        live1_ips = ''
+        # Defined in k8s_sips:
+        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
+        live1_ips += "46.30.212.67\n"
+        return live1_ips
+
     def get_groupone_live2_ipv4(self):
         """
             Lists all IP used by live2 cluster from group.One
@@ -29,6 +39,16 @@ class ServerListHandler():
         # Added for live2 according to JIRA: https://group-one.atlassian.net/browse/NET-283
         live2_ips += "46.30.212.70\n46.30.212.71\n46.30.212.72\n46.30.212.73\n"
         return live2_ips
+
+    def get_groupone_k8spod1_ipv4(self):
+        """
+            Lists all IP used by k8spod1 cluster from group.One
+        """
+        k8spod1_ips = ''
+        # Defined in k8s_sips:
+        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
+        k8spod1_ips += "46.30.211.168\n"
+        return k8spod1_ips
 
     def get_groupone_cpcss_ipv4(self):
         """
@@ -86,6 +106,8 @@ class ServerListHandler():
         # SaaS CNAME in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += self.get_groupone_saas_ipv4()
         text += self.get_groupone_live2_ipv4()
+        text += self.get_groupone_live1_ipv4()
+        text += self.get_groupone_k8spod1_ipv4()
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
         ovh_ipv4 = ''
@@ -130,6 +152,8 @@ class ServerListHandler():
         text += self.get_groupone_saas_ipv4()
         text += self.get_groupone_backend_ipv4()
         text += self.get_groupone_live2_ipv4()
+        text += self.get_groupone_live1_ipv4()
+        text += self.get_groupone_k8spod1_ipv4()
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
         ovh_ipv4 = ''
