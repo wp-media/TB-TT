@@ -116,6 +116,8 @@ class ServerListHandler():
             display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
             if 'worker' in display_name:
                 server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
+                if server_ips is None:
+                    continue
                 ovh_ipv4 += server_ips[IpAddress.IP_ADDRESS_IPV4] + "\n"
                 ovh_ipv6 += server_ips[IpAddress.IP_ADDRESS_IPV6] + "\n"
         text += ovh_ipv4
@@ -161,6 +163,8 @@ class ServerListHandler():
             display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
             if 'worker' in display_name:
                 server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
+                if server_ips is None:
+                    continue
                 ovh_ipv4 += server_ips[IpAddress.IP_ADDRESS_IPV4] + "\n"
         text += ovh_ipv4
         deduplicated_text = Duplication.remove_duplicated_lines(text)
@@ -179,6 +183,8 @@ class ServerListHandler():
             display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
             if 'worker' in display_name:
                 server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
+                if server_ips is None:
+                    continue
                 ovh_ipv6 += server_ips[IpAddress.IP_ADDRESS_IPV6] + "\n"
         text += ovh_ipv6
         deduplicated_text = Duplication.remove_duplicated_lines(text)
