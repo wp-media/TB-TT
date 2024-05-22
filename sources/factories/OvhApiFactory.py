@@ -56,7 +56,10 @@ class OvhApiFactory():
             Return the IPv6 and IPv4 of a dedicated server
         """
         client = self._get_ovh_client(app_context)
-        raw_result = client.get(f'/dedicated/server/{server_name}/ips')
+        try:
+            raw_result = client.get(f'/dedicated/server/{server_name}/ips')
+        except ovh.exceptions.ResourceExpiredError:
+            return None
         result = {}
         for server_ip in raw_result:
             ip_split = server_ip.split("/")
