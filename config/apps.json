@@ -7,7 +7,8 @@
         "RocketCDN App": "wpm-rocketcdn-app",
         "wp-rocket.me": "wpm-wprocket",
         "Imagify Website": "wpm-imagify-website",
-        "RocketCDN Website": "wpm-rocketcdn-website"
+        "RocketCDN Website": "wpm-rocketcdn-website",
+        "Task AI": "wpm-task-ai"
     },
     "envList": {
         "staging": "staging",
