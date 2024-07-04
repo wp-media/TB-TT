@@ -45,7 +45,7 @@ class ServerListHandler():
             return f"Error: Unable to reach CloudFlare. Error: {error}"
         if response.status_code == 200:
             ip_list = response.text.strip().split('\n')
-            return '\n'.join(ip_list)
+            return '\n'.join(ip_list) + '\n'
         return f"Error: Unable to fetch CloudFlare IPs. Status code: {response.status_code}"
 
     def get_groupone_live1_ipv4(self):
