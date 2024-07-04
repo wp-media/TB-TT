@@ -1,10 +1,11 @@
 """
     This module defines the handler for logic related to listing server IPs.
 """
+import requests
 from sources.factories.SlackMessageFactory import SlackMessageFactory
 from sources.factories.OvhApiFactory import OvhApiFactory
 from sources.utils import IpAddress, Duplication
-import requests
+
 
 class ServerListHandler():
     """
@@ -19,14 +20,26 @@ class ServerListHandler():
         self.ovh_api_factory = OvhApiFactory()
 
     def get_cloudflare_proxy_ipv4(self):
+        """
+            Retrieves the list of IPv4 used by CloudFlare and returns it as a string, one IP per line.
+            If an error occurs, it is returned.
+        """
         return self.get_cloudflare_proxy_ips('v4')
 
     def get_cloudflare_proxy_ipv6(self):
+        """
+            Retrieves the list of IPv6 used by CloudFlare and returns it as a string, one IP per line.
+            If an error occurs, it is returned.
+        """
         return self.get_cloudflare_proxy_ips('v6')
 
     def get_cloudflare_proxy_ips(self, ip_version):
+        """
+            Retrieves the list of IP matching ip_version used by CloudFlare and returns it as a string, one IP per line.
+            If an error occurs, it is returned.
+        """
         url = 'https://www.cloudflare.com/ips-' + ip_version + '/'
-        response = requests.get(url)
+        response = requests.get(url, timeout=5)
         if response.status_code == 200:
             ip_list = response.text.strip().split('\n')
             return '\n'.join(ip_list)
