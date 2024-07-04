@@ -1,6 +1,7 @@
 """
     This module defines the handler for logic related to listing server IPs.
 """
+import requests
 from sources.factories.SlackMessageFactory import SlackMessageFactory
 from sources.factories.OvhApiFactory import OvhApiFactory
 from sources.utils import IpAddress, Duplication
@@ -17,6 +18,32 @@ class ServerListHandler():
         """
         self.slack_message_factory = SlackMessageFactory()
         self.ovh_api_factory = OvhApiFactory()
+
+    def get_cloudflare_proxy_ipv4(self):
+        """
+            Retrieves the list of IPv4 used by CloudFlare and returns it as a string, one IP per line.
+            If an error occurs, it is returned.
+        """
+        return self.get_cloudflare_proxy_ips('v4')
+
+    def get_cloudflare_proxy_ipv6(self):
+        """
+            Retrieves the list of IPv6 used by CloudFlare and returns it as a string, one IP per line.
+            If an error occurs, it is returned.
+        """
+        return self.get_cloudflare_proxy_ips('v6')
+
+    def get_cloudflare_proxy_ips(self, ip_version):
+        """
+            Retrieves the list of IP matching ip_version used by CloudFlare and returns it as a string, one IP per line.
+            If an error occurs, it is returned.
+        """
+        url = 'https://www.cloudflare.com/ips-' + ip_version + '/'
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            ip_list = response.text.strip().split('\n')
+            return '\n'.join(ip_list)
+        return f"Error: Unable to fetch CloudFlare IPs. Status code: {response.status_code}"
 
     def get_groupone_live1_ipv4(self):
         """
@@ -81,6 +108,8 @@ class ServerListHandler():
         ipv4 = ''
         ipv4 += "185.10.9.100\n"
         ipv4 += "185.10.9.101\n"
+        ipv4 += "185.10.9.102\n"
+        ipv4 += "185.10.9.103\n"
         return ipv4
 
     def generate_wp_rocket_ips_human_readable(self, app_context):
@@ -92,7 +121,8 @@ class ServerListHandler():
         text += "License validation/activation, update check, plugin information:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://wp-rocket.me\n"
-        text += self.get_groupone_proxy_ipv4()
+        text += self.get_cloudflare_proxy_ipv4()
+        text += self.get_cloudflare_proxy_ipv6()
         text += "\n"
 
         text += "Load CSS Asynchronously:\n"
@@ -146,6 +176,8 @@ class ServerListHandler():
             List all IPv4 used for WP Rocket, machine readable with one IP per line and no text
         """
         text = ""
+        # CloudFlare proxy
+        text += self.get_cloudflare_proxy_ipv4()
         # group.One
         text += self.get_groupone_proxy_ipv4()
         text += self.get_groupone_live2_ipv4()
@@ -170,6 +202,8 @@ class ServerListHandler():
             List all IPv6 used for WP Rocket, machine readable with one IP per line and no text
         """
         text = ""
+        # CloudFlare proxy
+        text += self.get_cloudflare_proxy_ipv6()
         # group.One
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
