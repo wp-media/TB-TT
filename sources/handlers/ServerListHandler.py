@@ -39,7 +39,10 @@ class ServerListHandler():
             If an error occurs, it is returned.
         """
         url = 'https://www.cloudflare.com/ips-' + ip_version + '/'
-        response = requests.get(url, timeout=5)
+        try:
+            response = requests.get(url, timeout=5)
+        except requests.exceptions.RequestException as error:
+            return f"Error: Unable to reach CloudFlare. Error: {error}"
         if response.status_code == 200:
             ip_list = response.text.strip().split('\n')
             return '\n'.join(ip_list)
