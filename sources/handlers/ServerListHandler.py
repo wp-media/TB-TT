@@ -77,7 +77,7 @@ class ServerListHandler():
         k8spod1_ips = ''
         # Defined in k8spod1_sips & k8spod1_ingress:
         # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
-        k8spod1_ips += "46.30.211.168\n46.30.212.120\n"
+        k8spod1_ips += "46.30.211.168\n46.30.212.120\n46.30.212.76\n46.30.212.77\n46.30.212.78\n46.30.212.79\n"
         return k8spod1_ips
 
     def get_groupone_cpcss_ipv4(self):
