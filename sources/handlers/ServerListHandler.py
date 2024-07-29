@@ -145,7 +145,7 @@ class ServerListHandler():
         ovh_ipv6 = ''
         for server_name in all_server_list:
             display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
-            if 'worker' in display_name:
+            if 'worker' in display_name or 'mirror' in display_name:
                 server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
                 if server_ips is None:
                     continue
@@ -191,7 +191,7 @@ class ServerListHandler():
         ovh_ipv4 = ''
         for server_name in all_server_list:
             display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
-            if 'worker' in display_name:
+            if 'worker' in display_name or 'mirror' in display_name:
                 server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
                 if server_ips is None:
                     continue
@@ -213,7 +213,7 @@ class ServerListHandler():
         ovh_ipv6 = ''
         for server_name in all_server_list:
             display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
-            if 'worker' in display_name:
+            if 'worker' in display_name or 'mirror' in display_name:
                 server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
                 if server_ips is None:
                     continue
