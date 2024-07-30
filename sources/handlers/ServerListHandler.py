@@ -56,7 +56,7 @@ class ServerListHandler():
         # Provided by group.One Ops based on
         # https://gitlab.group.one/systems/group.one-authdns/-/blob/main/ipam/internet.yaml?ref_type=heads
         # Contact group.One ops for more details
-        groupone_ips += "185.10.8.0/22\n46.30.210.0/24\n46.30.211.0/24\n46.30.212.0/24\n46.30.214.0/24"
+        groupone_ips += "185.10.8.0/22\n46.30.210.0/24\n46.30.211.0/24\n46.30.212.0/24\n46.30.214.0/24\n"
         return groupone_ips
 
     def generate_wp_rocket_ips_human_readable(self, app_context):
