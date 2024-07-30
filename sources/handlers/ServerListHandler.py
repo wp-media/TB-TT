@@ -48,72 +48,16 @@ class ServerListHandler():
             return '\n'.join(ip_list) + '\n'
         return f"Error: Unable to fetch CloudFlare IPs. Status code: {response.status_code}"
 
-    def get_groupone_live1_ipv4(self):
+    def get_groupone_ipv4(self):
         """
-            Lists all IP used by live1 cluster from group.One
+            Lists all IP ranges used by group.One
         """
-        live1_ips = ''
-        # Defined in k8s_live1_sips & k8s_live1_ingress:
-        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
-        live1_ips += "46.30.212.67\n46.30.212.92\n"
-        return live1_ips
-
-    def get_groupone_live2_ipv4(self):
-        """
-            Lists all IP used by live2 cluster from group.One
-        """
-        live2_ips = ''
-        # Defined in k8s_live2_sips:
-        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
-        live2_ips += "46.30.212.68\n46.30.212.70\n46.30.212.71\n46.30.212.72\n46.30.212.73\n"
-        # Defined in k8s_live2_ingress:
-        live2_ips += "46.30.212.116\n"
-        return live2_ips
-
-    def get_groupone_k8spod1_ipv4(self):
-        """
-            Lists all IP used by k8spod1 cluster from group.One
-        """
-        k8spod1_ips = ''
-        # Defined in k8spod1_sips & k8spod1_ingress:
-        # https://gitlab.one.com/systems/chef-repo/-/blob/master/roles/onecom-global-firewall-macros.json#L173
-        k8spod1_ips += "46.30.211.168\n46.30.212.120\n46.30.212.76\n46.30.212.77\n46.30.212.78\n46.30.212.79\n"
-        return k8spod1_ips
-
-    def get_groupone_cpcss_ipv4(self):
-        """
-            Lists all IPv4 used specifically by CPCSS service from group.One
-        """
-        ipv4 = ''
-        ipv4 += "46.30.212.116\n"
-        return ipv4
-
-    def get_groupone_saas_ipv4(self):
-        """
-            Lists all IPv4 used specifically by WP Rocket SaaS service from group.One
-        """
-        ipv4 = ''
-        ipv4 += "46.30.212.116\n"
-        return ipv4
-
-    def get_groupone_backend_ipv4(self):
-        """
-            Lists all IPv4 used specifically by backend service from group.One
-        """
-        ipv4 = ''
-        ipv4 += "46.30.212.116\n"
-        return ipv4
-
-    def get_groupone_proxy_ipv4(self):
-        """
-            Lists all IPv4 used for the wpmedia pod proxies
-        """
-        ipv4 = ''
-        ipv4 += "185.10.9.100\n"
-        ipv4 += "185.10.9.101\n"
-        ipv4 += "185.10.9.102\n"
-        ipv4 += "185.10.9.103\n"
-        return ipv4
+        groupone_ips = ''
+        # Provided by group.One Ops based on
+        # https://gitlab.group.one/systems/group.one-authdns/-/blob/main/ipam/internet.yaml?ref_type=heads
+        # Contact group.One ops for more details
+        groupone_ips += "185.10.8.0/22\n46.30.210.0/24\n46.30.211.0/24\n46.30.212.0/24\n46.30.214.0/24"
+        return groupone_ips
 
     def generate_wp_rocket_ips_human_readable(self, app_context):
         """
@@ -131,14 +75,12 @@ class ServerListHandler():
         text += "Load CSS Asynchronously:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://cpcss.wp-rocket.me\n"
-        text += self.get_groupone_live2_ipv4()
+        text += self.get_groupone_ipv4()
         text += "\n"
 
         text += "Remove Unused CSS:\n"
         # SaaS CNAME in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
-        text += self.get_groupone_live2_ipv4()
-        text += self.get_groupone_live1_ipv4()
-        text += self.get_groupone_k8spod1_ipv4()
+        text += self.get_groupone_ipv4()
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
         ovh_ipv4 = ''
@@ -164,13 +106,12 @@ class ServerListHandler():
         text += "Dynamic exclusions and inclusions:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://b.rucss.wp-rocket.me\n"
-        text += self.get_groupone_backend_ipv4()
+        text += self.get_groupone_ipv4()
         text += "\n"
 
         text += "RocketCDN subscription:\n"
         text += "https://rocketcdn.me/api/\n"
-        text += self.get_groupone_proxy_ipv4()
-        text += self.get_groupone_live2_ipv4()
+        text += self.get_groupone_ipv4()
 
         return text
 
@@ -182,10 +123,7 @@ class ServerListHandler():
         # CloudFlare proxy
         text += self.get_cloudflare_proxy_ipv4()
         # group.One
-        text += self.get_groupone_proxy_ipv4()
-        text += self.get_groupone_live2_ipv4()
-        text += self.get_groupone_live1_ipv4()
-        text += self.get_groupone_k8spod1_ipv4()
+        text += self.get_groupone_ipv4()
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
         ovh_ipv4 = ''
