@@ -1,0 +1,12 @@
+name: 'PR TaskList Completed Checker'
+on: 
+  pull_request:
+    types: [edited, opened, synchronize, reopened]
+
+jobs:
+  task-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: wp-media/pr-checklist-action@test/adaptation-to-WPMedia-template
+        with:
+          repo-token: "${{ secrets.PR_TEMPLATE_TOKEN }}"
