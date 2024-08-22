@@ -7,6 +7,6 @@ jobs:
   task-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: wp-media/pr-checklist-action@test/adaptation-to-WPMedia-template
+      - uses: wp-media/pr-checklist-action@enhancement/update-for-PR-template-august-2024
         with:
           repo-token: "${{ secrets.PR_TEMPLATE_TOKEN }}"
