@@ -1,4 +1,4 @@
-name: 'PR TaskList Completed Checker'
+name: 'PR Template Checker'
 on: 
   pull_request:
     types: [edited, opened, synchronize, reopened]
