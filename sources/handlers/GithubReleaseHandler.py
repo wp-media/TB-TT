@@ -33,7 +33,9 @@ class GithubReleaseHandler():
 
         # Send a message to Slack
         text = "The draft release note for " + repository_readable_name + " " + release_params.version
-        text += " is available on <" + notion_url + "|Notion>. "
+        text += " is available on <" + notion_url + "|Notion>."
+        text += "\n"
+        text += release_params.body
 
         blocks = self.slack_message_factory.get_release_note_review_blocks(text)
 
