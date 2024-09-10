@@ -91,12 +91,12 @@ jobs:
           name: coverage-report-${{ github.run_id }}
 
       - name: Install dependencies
-        run: pip install git+https://github.com/MathieuLamiot/diff_cover   
+        run: pip install diff-cover
   
       - name: Generate diff-coverage report
         if: github.event_name == 'pull_request'
         run: |
-          diff-cover coverage.xml --compare-branch=origin/${{ github.base_ref }} --markdown-report diff-cover-report.md --exclude test*.py --fail-under=50 --expand_coverage_report
+          diff-cover coverage.xml --compare-branch=origin/${{ github.base_ref }} --markdown-report diff-cover-report.md --exclude test*.py --fail-under=50 --expand-coverage-report
           echo "DIFF_COVER_EXIT_STATUS=$?" >> $GITHUB_ENV
         shell: bash
 
