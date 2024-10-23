@@ -57,7 +57,9 @@ class NotionFactory():
         )
 
         if response.status_code != 200:
-            raise ValueError('Notion API could not create the DB row.')
+            error_message = f"Notion API could not create the DB row. Response code: {response.status_code}. Error message: "
+            error_message += f"{getattr(response, 'code', 'No code')}: {getattr(response, 'message', 'No message')}"
+            raise ValueError(error_message)
         page_id = response.json().get('id')
         page_id_linkable = page_id.replace('-', '')
         page_url = f'https://www.notion.so/wpmedia/{page_id_linkable}'
