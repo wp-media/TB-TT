@@ -56,7 +56,6 @@ class ServerListHandler():
         # Provided by group.One Ops based on
         # https://gitlab.group.one/systems/group.one-authdns/-/blob/main/ipam/internet.yaml?ref_type=heads
         # Contact group.One ops for more details
-        # pylint: disable-next=line-too-long
         groupone_ips += "185.10.8.0/22\n"
         groupone_ips += "46.30.210.0/24\n"
         groupone_ips += "46.30.211.0/24\n"
