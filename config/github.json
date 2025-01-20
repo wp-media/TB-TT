@@ -11,7 +11,8 @@
         "Michael Lee": "jeawhanlee",
         "Gaël Robin": "Miraeld",
         "Opeyemi Ibrahim": "Khadreal",
-        "Mathieu Lamiot": "MathieuLamiot"
+        "Mathieu Lamiot": "MathieuLamiot",
+        "Arielle Lucca": "ariellelucca"
     },
     "statusFieldId": "PVTSSF_lADOAMEyYM4AaLebzgQxzGc",
     "initialStatusValue": "4ff049da",
@@ -31,6 +32,7 @@
         "wp-rocket.me": "WP Rocket website",
         "imagify-website": "Imagify website",
         "rocketcdn-website": "RocketCDN website",
+        "backwpup-website": "BackWPup website",
         "metasearch": "Metasearch",
         "wp-rocket-e2e": "Rocket-E2E"
     }
