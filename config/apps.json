@@ -8,8 +8,8 @@
         "wp-rocket.me": "wpm-wprocket",
         "Imagify Website": "wpm-imagify-website",
         "RocketCDN Website": "wpm-rocketcdn-website",
-        "BackWPup Website": "wpm-backwpup-website",
-        "Task AI": "wpm-task-ai"
+        "Task AI": "wpm-task-ai",
+        "wp-media.me": "wpm-wpmediame"
     },
     "envList": {
         "staging": "staging",
