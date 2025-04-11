@@ -3,7 +3,7 @@
 """
 import requests
 from sources.factories.SlackMessageFactory import SlackMessageFactory
-from sources.utils import IpAddress, Duplication
+from sources.utils import Duplication
 
 
 class ServerListHandler():
@@ -61,7 +61,7 @@ class ServerListHandler():
         groupone_ips += "46.30.214.0/24\n"
         groupone_ips += "5.249.224.0/24\n"
         return groupone_ips
-    
+
     def get_groupone_ipv6(self):
         """
             Lists all IP ranges used by group.One
@@ -73,7 +73,7 @@ class ServerListHandler():
         groupone_ips += "2a02:2350:4:200::/55\n"  # ipv6 k8spods CPH3
         return groupone_ips
 
-    def generate_wp_rocket_ips_human_readable(self, app_context):
+    def generate_wp_rocket_ips_human_readable(self):
         """
             Generates a text list of all IPs used by WP Rocket, human readable
         """
@@ -119,7 +119,7 @@ class ServerListHandler():
 
         return text
 
-    def generate_wp_rocket_ipv4_machine_readable(self, app_context):
+    def generate_wp_rocket_ipv4_machine_readable(self):
         """
             List all IPv4 used for WP Rocket, machine readable with one IP per line and no text
         """
@@ -132,7 +132,7 @@ class ServerListHandler():
         deduplicated_text = Duplication.remove_duplicated_lines(text)
         return deduplicated_text
 
-    def generate_wp_rocket_ipv6_machine_readable(self, app_context):
+    def generate_wp_rocket_ipv6_machine_readable(self):
         """
             List all IPv6 used for WP Rocket, machine readable with one IP per line and no text
         """
@@ -149,5 +149,5 @@ class ServerListHandler():
         """
             List all IPs used for WP Rocket and sends it in a Slack DM
         """
-        text = self.generate_wp_rocket_ips_human_readable(app_context)
+        text = self.generate_wp_rocket_ips_human_readable()
         self.slack_message_factory.post_message(app_context, slack_user, text)
