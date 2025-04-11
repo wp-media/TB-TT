@@ -3,7 +3,6 @@
 """
 import requests
 from sources.factories.SlackMessageFactory import SlackMessageFactory
-from sources.factories.OvhApiFactory import OvhApiFactory
 from sources.utils import IpAddress, Duplication
 
 
@@ -17,7 +16,6 @@ class ServerListHandler():
             The handler instanciates the objects it needed to complete the processing of the request.
         """
         self.slack_message_factory = SlackMessageFactory()
-        self.ovh_api_factory = OvhApiFactory()
 
     def get_cloudflare_proxy_ipv4(self):
         """
@@ -99,20 +97,6 @@ class ServerListHandler():
         # SaaS CNAME in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += self.get_groupone_ipv4()
         text += self.get_groupone_ipv6()
-        # OVH servers
-        all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
-        ovh_ipv4 = ''
-        ovh_ipv6 = ''
-        for server_name in all_server_list:
-            display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
-            if 'worker' in display_name or 'mirror' in display_name:
-                server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
-                if server_ips is None:
-                    continue
-                ovh_ipv4 += server_ips[IpAddress.IP_ADDRESS_IPV4] + "\n"
-                ovh_ipv6 += server_ips[IpAddress.IP_ADDRESS_IPV6] + "\n"
-        text += ovh_ipv4
-        text += ovh_ipv6
         # SaaS User Agents
         text += "User Agents:\n"
         # pylint: disable-next=line-too-long
@@ -144,17 +128,7 @@ class ServerListHandler():
         text += self.get_cloudflare_proxy_ipv4()
         # group.One
         text += self.get_groupone_ipv4()
-        # OVH servers
-        all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
-        ovh_ipv4 = ''
-        for server_name in all_server_list:
-            display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
-            if 'worker' in display_name or 'mirror' in display_name:
-                server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
-                if server_ips is None:
-                    continue
-                ovh_ipv4 += server_ips[IpAddress.IP_ADDRESS_IPV4] + "\n"
-        text += ovh_ipv4
+
         deduplicated_text = Duplication.remove_duplicated_lines(text)
         return deduplicated_text
 
@@ -167,17 +141,7 @@ class ServerListHandler():
         text += self.get_cloudflare_proxy_ipv6()
         # group.One
         text += self.get_groupone_ipv6()
-        # OVH servers
-        all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
-        ovh_ipv6 = ''
-        for server_name in all_server_list:
-            display_name = self.ovh_api_factory.get_dedicated_server_display_name(app_context, server_name)
-            if 'worker' in display_name or 'mirror' in display_name:
-                server_ips = self.ovh_api_factory.get_dedicated_server_ips(app_context, server_name)
-                if server_ips is None:
-                    continue
-                ovh_ipv6 += server_ips[IpAddress.IP_ADDRESS_IPV6] + "\n"
-        text += ovh_ipv6
+
         deduplicated_text = Duplication.remove_duplicated_lines(text)
         return deduplicated_text
 

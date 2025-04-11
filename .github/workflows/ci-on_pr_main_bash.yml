@@ -15,9 +15,6 @@ env:
   TBTT_SLACK_SIGNING_SECRET: tbtt_slack_signing_secret
   TBTT_SLACK_USER_TOKEN: tbtt_slack_user_token
   TBTT_GITHUB_WEBHOOK_SECRET: tbtt_github_webhook_secret
-  TBTT_OVH_APP_KEY: a
-  TBTT_OVH_APP_SECRET: b
-  TBTT_OVH_CONSUMER_KEY: c
   TBTT_GODP_AUTH_TOKEN: d
   TBTT_NOTION_API_KEY: e
 

@@ -12,7 +12,7 @@ from sources.models.GithubReleaseParam import GithubReleaseParam
 
 class NotionFactory():
     """
-        Class managing the API for OVH
+        Class managing the API for Notion
 
     """
     def __init__(self):
