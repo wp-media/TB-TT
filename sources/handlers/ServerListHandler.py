@@ -63,6 +63,17 @@ class ServerListHandler():
         groupone_ips += "46.30.214.0/24\n"
         groupone_ips += "5.249.224.0/24\n"
         return groupone_ips
+    
+    def get_groupone_ipv6(self):
+        """
+            Lists all IP ranges used by group.One
+        """
+        groupone_ips = ''
+        # Provided by group.One Ops based on
+        # https://gitlab.group.one/systems/group.one-authdns/-/blob/main/ipam/internet.yaml?ref_type=heads
+        # Contact group.One ops for more details
+        groupone_ips += "2a02:2350:4:200::/55\n"  # ipv6 k8spods CPH3
+        return groupone_ips
 
     def generate_wp_rocket_ips_human_readable(self, app_context):
         """
@@ -81,11 +92,13 @@ class ServerListHandler():
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://cpcss.wp-rocket.me\n"
         text += self.get_groupone_ipv4()
+        text += self.get_groupone_ipv6()
         text += "\n"
 
         text += "Remove Unused CSS:\n"
         # SaaS CNAME in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += self.get_groupone_ipv4()
+        text += self.get_groupone_ipv6()
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
         ovh_ipv4 = ''
@@ -112,11 +125,13 @@ class ServerListHandler():
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://b.rucss.wp-rocket.me\n"
         text += self.get_groupone_ipv4()
+        text += self.get_groupone_ipv6()
         text += "\n"
 
         text += "RocketCDN subscription:\n"
         text += "https://rocketcdn.me/api/\n"
         text += self.get_groupone_ipv4()
+        text += self.get_groupone_ipv6()
 
         return text
 
@@ -151,6 +166,7 @@ class ServerListHandler():
         # CloudFlare proxy
         text += self.get_cloudflare_proxy_ipv6()
         # group.One
+        text += self.get_groupone_ipv6()
         # OVH servers
         all_server_list = self.ovh_api_factory.get_dedicated_servers(app_context)
         ovh_ipv6 = ''
