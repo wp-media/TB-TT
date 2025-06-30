@@ -10,7 +10,8 @@
         "RocketCDN Website": "wpm-rocketcdn-website",
         "BackWPup Website": "wpm-backwpup-website",
         "Task AI": "wpm-task-ai",
-        "wp-media.me": "wpm-wpmediame"
+        "wp-media.me": "wpm-wpmediame",
+        "RUCSS Backend": "rucss-backend"
     },
     "envList": {
         "staging": "staging",
