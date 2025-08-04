@@ -11,8 +11,8 @@
         "BackWPup Website": "wpm-backwpup-website",
         "Task AI": "wpm-task-ai",
         "wp-media.me": "wpm-wpmediame",
-		"RUCSS Backend": "wpm-rucss-backend",
-		"Licenses App": "wpm-licenses-app"
+	"RUCSS Backend": "wpm-rucss-backend",
+	"Licenses App": "wpm-licenses-app"
     },
     "envList": {
         "staging": "staging",
