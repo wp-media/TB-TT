@@ -13,12 +13,14 @@
         "wp-media.me": "wpm-wpmediame",
 	    "RUCSS Backend": "wpm-rucss-backend",
 	    "Licenses App": "wpm-licenses-app",
-        "Rocket Radar": "rocket-radar"
+        "Rocket Radar": "rocket-radar",
+        "WordPress AI Builder": "wp-ai-builder"
     },
     "envList": {
         "staging": "staging",
         "next": "next",
         "test": "test",
+        "test1": "test1",
         "mirror": "mirror",
         "sandbox 1": "sandbox1",
         "sandbox 2": "sandbox2"
