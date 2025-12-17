@@ -48,7 +48,7 @@ class ServerListHandler():
 
     def get_groupone_ipv4(self):
         """
-            Lists all IP ranges used by group.One
+        Lists all IPv4 addresses used by group.One and returns them as a string with one IP per line.
         """
         # Provided by group.One Ops based on
         # Contact group.One ops for more details
