@@ -2,7 +2,10 @@
     Unit tests for the ServerListHandler.py main file
 """
 
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
+
+import requests
+
 from sources.handlers.ServerListHandler import ServerListHandler
 
 # pylint: disable=unused-argument
@@ -10,12 +13,14 @@ from sources.handlers.ServerListHandler import ServerListHandler
 
 def mock_cloudflare_ipv4_response(*args, **kwargs):
     """
-        Mocks the requests.get response for CloudFlare IPv4
+    Mocks the requests.get response for CloudFlare IPv4
     """
-    class RequestReturn():
+
+    class RequestReturn:
         """
-            Mocks the return of requests.get
+        Mocks the return of requests.get
         """
+
         status_code = 200
         text = "173.245.48.0/20\n103.21.244.0/22\n103.22.200.0/22"
 
@@ -24,12 +29,14 @@ def mock_cloudflare_ipv4_response(*args, **kwargs):
 
 def mock_cloudflare_ipv6_response(*args, **kwargs):
     """
-        Mocks the requests.get response for CloudFlare IPv6
+    Mocks the requests.get response for CloudFlare IPv6
     """
-    class RequestReturn():
+
+    class RequestReturn:
         """
-            Mocks the return of requests.get
+        Mocks the return of requests.get
         """
+
         status_code = 200
         text = "2400:cb00::/32\n2606:4700::/32\n2803:f800::/32"
 
@@ -38,21 +45,26 @@ def mock_cloudflare_ipv6_response(*args, **kwargs):
 
 def mock_cloudflare_error_response(*args, **kwargs):
     """
-        Mocks the requests.get response for CloudFlare with error status
+    Mocks the requests.get response for CloudFlare with error status
     """
-    class RequestReturn():
+
+    class RequestReturn:
         """
-            Mocks the return of requests.get with error
+        Mocks the return of requests.get with error
         """
+
         status_code = 404
 
     return RequestReturn()
 
 
-@patch('sources.handlers.ServerListHandler.requests.get', side_effect=mock_cloudflare_ipv4_response)
+@patch(
+    "sources.handlers.ServerListHandler.requests.get",
+    side_effect=mock_cloudflare_ipv4_response,
+)
 def test_get_cloudflare_proxy_ipv4(mock_requests):
     """
-        Tests the get_cloudflare_proxy_ipv4 method returns CloudFlare IPv4 addresses
+    Tests the get_cloudflare_proxy_ipv4 method returns CloudFlare IPv4 addresses
     """
     handler = ServerListHandler()
     result = handler.get_cloudflare_proxy_ipv4()
@@ -62,10 +74,13 @@ def test_get_cloudflare_proxy_ipv4(mock_requests):
     assert mock_requests.call_args[0][0] == "https://www.cloudflare.com/ips-v4/"
 
 
-@patch('sources.handlers.ServerListHandler.requests.get', side_effect=mock_cloudflare_ipv6_response)
+@patch(
+    "sources.handlers.ServerListHandler.requests.get",
+    side_effect=mock_cloudflare_ipv6_response,
+)
 def test_get_cloudflare_proxy_ipv6(mock_requests):
     """
-        Tests the get_cloudflare_proxy_ipv6 method returns CloudFlare IPv6 addresses
+    Tests the get_cloudflare_proxy_ipv6 method returns CloudFlare IPv6 addresses
     """
     handler = ServerListHandler()
     result = handler.get_cloudflare_proxy_ipv6()
@@ -75,34 +90,38 @@ def test_get_cloudflare_proxy_ipv6(mock_requests):
     assert mock_requests.call_args[0][0] == "https://www.cloudflare.com/ips-v6/"
 
 
-@patch('sources.handlers.ServerListHandler.requests.get', side_effect=mock_cloudflare_error_response)
+@patch(
+    "sources.handlers.ServerListHandler.requests.get",
+    side_effect=mock_cloudflare_error_response,
+)
 def test_get_cloudflare_proxy_ips_error(mock_requests):
     """
-        Tests the get_cloudflare_proxy_ips method handles error status codes
+    Tests the get_cloudflare_proxy_ips method handles error status codes
     """
     handler = ServerListHandler()
-    result = handler.get_cloudflare_proxy_ips('v4')
+    result = handler.get_cloudflare_proxy_ips("v4")
 
     assert "Error: Unable to fetch CloudFlare IPs. Status code: 404" in result
     mock_requests.assert_called_once()
 
 
-@patch('sources.handlers.ServerListHandler.requests.get')
+@patch("sources.handlers.ServerListHandler.requests.get")
 def test_get_cloudflare_proxy_ips_exception(mock_requests):
     """
-        Tests the get_cloudflare_proxy_ips method handles request exceptions
+    Tests the get_cloudflare_proxy_ips method handles request exceptions
     """
-    import requests
-    mock_requests.side_effect = requests.exceptions.RequestException("Connection timeout")
+    mock_requests.side_effect = requests.exceptions.RequestException(
+        "Connection timeout"
+    )
     handler = ServerListHandler()
-    result = handler.get_cloudflare_proxy_ips('v4')
+    result = handler.get_cloudflare_proxy_ips("v4")
 
     assert "Error: Unable to reach CloudFlare" in result
 
 
 def test_get_groupone_ipv4():
     """
-        Tests the get_groupone_ipv4 method returns the correct list of IPs
+    Tests the get_groupone_ipv4 method returns the correct list of IPs
     """
     handler = ServerListHandler()
     result = handler.get_groupone_ipv4()
@@ -136,7 +155,7 @@ def test_get_groupone_ipv4():
     ]
 
     result_lines = result.split("\n")
-    for ip in expected_ips:
+    for ip in expected_ips:  # pylint: disable=invalid-name
         assert ip in result_lines, f"Expected IP {ip} not found in result"
 
     # Verify the count matches
@@ -145,7 +164,7 @@ def test_get_groupone_ipv4():
 
 def test_get_groupone_ipv4_format():
     """
-        Tests that get_groupone_ipv4 returns IPs in the correct format (one per line)
+    Tests that get_groupone_ipv4 returns IPs in the correct format (one per line)
     """
     handler = ServerListHandler()
     result = handler.get_groupone_ipv4()
@@ -163,7 +182,7 @@ def test_get_groupone_ipv4_format():
 
 def test_get_groupone_ipv6():
     """
-        Tests the get_groupone_ipv6 method returns the correct IPv6 range
+    Tests the get_groupone_ipv6 method returns the correct IPv6 range
     """
     handler = ServerListHandler()
     result = handler.get_groupone_ipv6()
@@ -172,10 +191,13 @@ def test_get_groupone_ipv6():
     assert result.endswith("\n")
 
 
-@patch('sources.handlers.ServerListHandler.requests.get', side_effect=mock_cloudflare_ipv4_response)
+@patch(
+    "sources.handlers.ServerListHandler.requests.get",
+    side_effect=mock_cloudflare_ipv4_response,
+)
 def test_generate_wp_rocket_ips_human_readable(mock_requests):
     """
-        Tests the generate_wp_rocket_ips_human_readable method includes all sections
+    Tests the generate_wp_rocket_ips_human_readable method includes all sections
     """
     handler = ServerListHandler()
     result = handler.generate_wp_rocket_ips_human_readable()
@@ -199,11 +221,14 @@ def test_generate_wp_rocket_ips_human_readable(mock_requests):
     assert "5.249.224.11" in result
 
 
-@patch('sources.handlers.ServerListHandler.requests.get', side_effect=mock_cloudflare_ipv4_response)
-@patch('sources.utils.Duplication.remove_duplicated_lines')
+@patch(
+    "sources.handlers.ServerListHandler.requests.get",
+    side_effect=mock_cloudflare_ipv4_response,
+)
+@patch("sources.utils.Duplication.remove_duplicated_lines")
 def test_generate_wp_rocket_ipv4_machine_readable(mock_dedup, mock_requests):
     """
-        Tests the generate_wp_rocket_ipv4_machine_readable method
+    Tests the generate_wp_rocket_ipv4_machine_readable method
     """
     mock_dedup.return_value = "173.245.48.0/20\n46.30.211.168\n"
 
@@ -218,11 +243,14 @@ def test_generate_wp_rocket_ipv4_machine_readable(mock_dedup, mock_requests):
     assert "CloudFlare" not in result
 
 
-@patch('sources.handlers.ServerListHandler.requests.get', side_effect=mock_cloudflare_ipv6_response)
-@patch('sources.utils.Duplication.remove_duplicated_lines')
+@patch(
+    "sources.handlers.ServerListHandler.requests.get",
+    side_effect=mock_cloudflare_ipv6_response,
+)
+@patch("sources.utils.Duplication.remove_duplicated_lines")
 def test_generate_wp_rocket_ipv6_machine_readable(mock_dedup, mock_requests):
     """
-        Tests the generate_wp_rocket_ipv6_machine_readable method
+    Tests the generate_wp_rocket_ipv6_machine_readable method
     """
     mock_dedup.return_value = "2400:cb00::/32\n2a02:2350:4:200::/55\n"
 
@@ -237,10 +265,13 @@ def test_generate_wp_rocket_ipv6_machine_readable(mock_dedup, mock_requests):
     assert "CloudFlare" not in result
 
 
-@patch('sources.handlers.ServerListHandler.requests.get', side_effect=mock_cloudflare_ipv4_response)
+@patch(
+    "sources.handlers.ServerListHandler.requests.get",
+    side_effect=mock_cloudflare_ipv4_response,
+)
 def test_send_wp_rocket_ips_to_slack(mock_requests):
     """
-        Tests the send_wp_rocket_ips_to_slack method calls post_message
+    Tests the send_wp_rocket_ips_to_slack method calls post_message
     """
     handler = ServerListHandler()
     mock_app_context = Mock()
@@ -262,7 +293,7 @@ def test_send_wp_rocket_ips_to_slack(mock_requests):
 
 def test_get_groupone_ipv4_no_ranges():
     """
-        Tests that get_groupone_ipv4 returns individual IPs, not CIDR ranges
+    Tests that get_groupone_ipv4 returns individual IPs, not CIDR ranges
     """
     handler = ServerListHandler()
     result = handler.get_groupone_ipv4()
