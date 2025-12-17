@@ -76,6 +76,7 @@ class ServerListHandler():
             "5.249.224.11",
         ]
         group_one_ips_str = "\n".join(group_one_ips)
+        group_one_ips_str = f"{group_one_ips_str}\n"
         return group_one_ips_str
 
     def get_groupone_ipv6(self):
