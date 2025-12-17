@@ -52,8 +52,7 @@ class ServerListHandler():
         """
         # Provided by group.One Ops based on
         # Contact group.One ops for more details
-
-        group_one_ips = [
+        groupone_ips = [
             "46.30.211.168",
             "46.30.212.76",
             "46.30.212.77",
@@ -75,9 +74,7 @@ class ServerListHandler():
             "5.249.224.10",
             "5.249.224.11",
         ]
-        group_one_ips_str = "\n".join(group_one_ips)
-        group_one_ips_str = f"{group_one_ips_str}\n"
-        return group_one_ips_str
+        return "\n".join(groupone_ips) + "\n"
 
     def get_groupone_ipv6(self):
         """
