@@ -154,7 +154,7 @@ def test_get_groupone_ipv4():
         "5.249.224.11",
     ]
 
-    result_lines = result.split("\n")
+    result_lines = [line for line in result.split("\n") if line]  # Filter out empty strings
     for ip in expected_ips:  # pylint: disable=invalid-name
         assert ip in result_lines, f"Expected IP {ip} not found in result"
 
