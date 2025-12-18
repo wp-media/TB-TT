@@ -48,19 +48,33 @@ class ServerListHandler():
 
     def get_groupone_ipv4(self):
         """
-            Lists all IP ranges used by group.One
+        Lists all IPv4 addresses used by group.One and returns them as a string with one IP per line.
         """
-        groupone_ips = ''
         # Provided by group.One Ops based on
-        # https://gitlab.group.one/systems/group.one-authdns/-/blob/main/ipam/internet.yaml?ref_type=heads
         # Contact group.One ops for more details
-        groupone_ips += "185.10.8.0/22\n"
-        groupone_ips += "46.30.210.0/24\n"
-        groupone_ips += "46.30.211.0/24\n"
-        groupone_ips += "46.30.212.0/24\n"
-        groupone_ips += "46.30.214.0/24\n"
-        groupone_ips += "5.249.224.0/24\n"
-        return groupone_ips
+        groupone_ips = [
+            "46.30.211.168",
+            "46.30.212.76",
+            "46.30.212.77",
+            "46.30.212.78",
+            "46.30.212.79",
+            "46.30.211.69",
+            "46.30.212.200",
+            "46.30.212.201",
+            "46.30.212.202",
+            "46.30.212.203",
+            "46.30.211.203",
+            "46.30.212.204",
+            "46.30.212.205",
+            "46.30.212.206",
+            "46.30.212.207",
+            "46.30.211.236",
+            "5.249.224.8",
+            "5.249.224.9",
+            "5.249.224.10",
+            "5.249.224.11",
+        ]
+        return "\n".join(groupone_ips) + "\n"
 
     def get_groupone_ipv6(self):
         """

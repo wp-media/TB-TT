@@ -1,0 +1,20 @@
+version: "3.2"
+
+services:
+  web:
+    image: tbtt-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    environment:
+      TBTT_GITHUB_ACCESS_TOKEN: tbtt_github_token
+      TBTT_SLACK_BOT_USER_TOKEN: tbtt_slack_bot_user_token
+      TBTT_SLACK_SIGNING_SECRET: tbtt_slack_signing_secret
+      TBTT_SLACK_USER_TOKEN: tbtt_slack_user_token
+      TBTT_GITHUB_WEBHOOK_SECRET: tbtt_github_webhook_secret
+      TBTT_GODP_AUTH_TOKEN: d
+      TBTT_NOTION_API_KEY: e

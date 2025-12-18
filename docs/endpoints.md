@@ -1,0 +1,224 @@
+# Tech Team Bot API Endpoints
+
+This document describes the available API endpoints and Slack commands for the Tech Team Bot.
+
+## Support Endpoints
+
+The support endpoints provide access to IP address information for WP Rocket services. These endpoints are used by the support team to retrieve IP addresses for firewall configuration and troubleshooting purposes.
+
+### Base URL
+
+All support endpoints are prefixed with `/support`
+
+### Endpoints
+
+#### 1. Get WP Rocket IPs (Human Readable)
+
+Returns a human-readable list of all IP addresses used by WP Rocket services, including CloudFlare proxy IPs and group.One infrastructure IPs.
+
+**Endpoint:** `/support/wprocket-ips`
+
+**Method:** `GET`
+
+**Authentication:** None required
+
+**Response Format:** Plain text
+
+**Response Example:**
+
+```
+List of IPs used for WP Rocket:
+
+License validation/activation, update check, plugin information:
+https://wp-rocket.me
+173.245.48.0/20
+103.21.244.0/22
+[CloudFlare IPv4 and IPv6 ranges...]
+
+Load CSS Asynchronously:
+https://cpcss.wp-rocket.me
+46.30.211.168
+46.30.212.76
+[group.One IPs...]
+2a02:2350:4:200::/55
+
+Remove Unused CSS:
+46.30.211.168
+[group.One IPs...]
+User Agents:
+WP-Rocket/SaaS Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36...
+
+Dynamic exclusions and inclusions:
+https://b.rucss.wp-rocket.me
+[group.One IPs...]
+
+RocketCDN subscription:
+https://rocketcdn.me/api/
+[group.One IPs...]
+```
+
+**Use Case:**
+
+- Support team reference documentation
+- Manual firewall configuration
+- Troubleshooting connectivity issues
+
+---
+
+#### 2. Get WP Rocket IPv4 (Machine Readable)
+
+Returns a machine-readable list of all IPv4 addresses used by WP Rocket services. One IP per line, no descriptive text, with duplicates removed.
+
+**Endpoint:** `/support/wprocket-ips/ipv4`
+
+**Method:** `GET`
+
+**Authentication:** None required
+
+**Response Format:** Plain text (one IP per line)
+
+**Response Example:**
+
+```
+173.245.48.0/20
+103.21.244.0/22
+46.30.211.168
+46.30.212.76
+46.30.212.77
+5.249.224.8
+5.249.224.9
+```
+
+**Use Case:**
+
+- Automated firewall rule generation
+- Scripted IP whitelisting
+- Integration with security tools
+
+---
+
+#### 3. Get WP Rocket IPv6 (Machine Readable)
+
+Returns a machine-readable list of all IPv6 addresses used by WP Rocket services. One IP per line, no descriptive text, with duplicates removed.
+
+**Endpoint:** `/support/wprocket-ips/ipv6`
+
+**Method:** `GET`
+
+**Authentication:** None required
+
+**Response Format:** Plain text (one IP per line)
+
+**Response Example:**
+
+```
+2400:cb00::/32
+2606:4700::/32
+2a02:2350:4:200::/55
+```
+
+**Use Case:**
+
+- Automated firewall rule generation for IPv6
+- Scripted IP whitelisting for IPv6
+- Integration with security tools
+
+---
+
+## Slack Commands
+
+### `/wprocket-ips` Command
+
+Sends a direct message to the requesting user with a human-readable list of all IP addresses used by WP Rocket services.
+
+**Command:** `/wprocket-ips`
+
+**Access:** Available to all Slack workspace members
+
+**Response:** Direct message (DM) from the bot
+
+**Response Content:** Same format as the `/support/wprocket-ips` endpoint
+
+**Example Usage:**
+
+1. User types `/wprocket-ips` in any Slack channel
+2. Bot sends a DM to the user with the complete IP list
+3. User can copy the information for firewall configuration or documentation
+
+**Implementation Details:**
+
+- Command is handled by `SlackCommandHandler.wp_rocket_ips_command_callback()`
+- Processing runs in a separate thread to avoid blocking
+- Uses `ServerListHandler.send_wp_rocket_ips_to_slack()` to generate and send the message
+- Message includes:
+  - CloudFlare proxy IPs (IPv4 and IPv6)
+  - group.One infrastructure IPs (20 individual IPv4 addresses and IPv6 ranges)
+  - User agent strings for WP Rocket SaaS services
+  - Service-specific IP groupings with descriptive headers
+
+---
+
+## IP Address Sources
+
+### CloudFlare IPs
+
+- Fetched dynamically from `https://www.cloudflare.com/ips-v4/` and `https://www.cloudflare.com/ips-v6/`
+- Updated in real-time when endpoints are called
+- Used for services proxied through CloudFlare (e.g., wp-rocket.me)
+
+### group.One IPs
+
+- **IPv4:** 20 specific IP addresses provided by group.One Ops
+  - Range: `46.30.211.x`, `46.30.212.x`, `5.249.224.x`
+  - Used for: Load CSS Asynchronously, Remove Unused CSS, Dynamic exclusions, RocketCDN subscription
+- **IPv6:** CIDR ranges from group.One infrastructure
+  - `2a02:2350:4:200::/55` (k8spods CPH3)
+
+**Note:** group.One IP addresses are hardcoded based on infrastructure configuration provided by group.One Ops. Contact group.One Ops for updates.
+
+---
+
+## Technical Architecture
+
+### Module Structure
+
+```
+TechTeamBot (sources/TechTeamBot.py)
+ __setup_support_enpoints()
+     SupportListener (sources/listeners/SupportListener.py)
+         ServerListHandler (sources/handlers/ServerListHandler.py)
+             get_cloudflare_proxy_ipv4()
+             get_cloudflare_proxy_ipv6()
+             get_groupone_ipv4()
+             get_groupone_ipv6()
+             generate_wp_rocket_ips_human_readable()
+             generate_wp_rocket_ipv4_machine_readable()
+             generate_wp_rocket_ipv6_machine_readable()
+```
+
+### Error Handling
+
+- **CloudFlare fetch errors:** Returns error message in response (e.g., "Error: Unable to reach CloudFlare")
+- **Invalid requests:** Standard Flask error handling
+- **Slack command errors:** Logged to application logs, user receives no response (Slack timeout)
+
+---
+
+## Maintenance
+
+### Updating group.One IPs
+
+To update the group.One IP addresses:
+
+1. Obtain the updated IP list from group.One Ops
+2. Update the `group_one_ips` list in `sources/handlers/ServerListHandler.py:get_groupone_ipv4()`
+3. Run tests: `docker-compose exec -T web python -m pytest tests/unit/ServerListHandlerTest.py`
+4. Deploy the updated code
+
+### Monitoring
+
+- All endpoint calls are logged to the application logs
+- CloudFlare IP fetch failures are logged with error details
+- Slack command processing is logged with thread start information
+
+---

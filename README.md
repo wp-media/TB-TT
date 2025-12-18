@@ -12,6 +12,9 @@ The Slack integration requires the app to be declared and installed as a Slack A
 Run the script app.py
 The app will listen on the configured port for API calls.
 
+## Documentation
+For detailed information about available API endpoints and Slack commands, see [docs/endpoints.md](docs/endpoints.md).
+
 ## Features
 ### Create GitHub tasks from Slack
 The Slack app adds a shortcut to create a GitHub task in the configured GitHub Project(V2). When triggered, a modal is opened to fill out information related to the task.
