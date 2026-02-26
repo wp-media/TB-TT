@@ -14,6 +14,7 @@
 	    "RUCSS Backend": "wpm-rucss-backend",
 	    "Licenses App": "wpm-licenses-app",
         "Rocket Radar": "rocket-radar",
+		"WP Media Hub": "wp-media-hub",
         "WordPress AI Builder": "wp-ai-builder"
     },
     "envList": {
