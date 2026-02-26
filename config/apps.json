@@ -9,11 +9,10 @@
         "Imagify Website": "wpm-imagify-website",
         "RocketCDN Website": "wpm-rocketcdn-website",
         "BackWPup Website": "wpm-backwpup-website",
-        "RUCSS Backend": "wpm-rucss-backend",
-        "Licenses App": "wpm-licenses-app",
         "Task AI": "wpm-task-ai",
         "wp-media.me": "wpm-wpmediame",
-        "WP Media Hub": "wp-media-hub"
+        "RUCSS Backend": "wpm-rucss-backend",
+        "Licenses App": "wpm-licenses-app"
     },
     "envList": {
         "staging": "staging",
