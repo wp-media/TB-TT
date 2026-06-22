@@ -210,7 +210,7 @@ def test_generate_wp_rocket_ips_human_readable(mock_requests):
     assert "https://cpcss.wp-rocket.me" in result
     assert "Remove Unused CSS:" in result
     assert "User Agents:" in result
-    assert "WP-Rocket/SaaS" in result
+    assert "WP-Rocket-SaaS/1.0" in result
     assert "Dynamic exclusions and inclusions:" in result
     assert "https://b.rucss.wp-rocket.me" in result
     assert "RocketCDN subscription:" in result
