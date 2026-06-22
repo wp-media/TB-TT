@@ -119,6 +119,14 @@ class ServerListHandler():
         text += "WP-Rocket/SaaS Mozilla/5.0 (Linux; Android 13; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Mobile Safari/537.36\n" # noqa
         text += "\n"
 
+        # pylint: disable-next=line-too-long
+        text += "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 (compatible; WP-Rocket-SaaS/1.0; +https://wp-rocket.me/bot/)\n" # noqa
+        text += "\n"
+
+        # pylint: disable-next=line-too-long
+        text += "Mozilla/5.0 (Linux; Android 13; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36 (compatible; WP-Rocket-SaaS/1.0; +https://wp-rocket.me/bot/)\n" # noqa
+        text += "\n"
+
         text += "Dynamic exclusions and inclusions:\n"
         # Defined in https://gitlab.one.com/systems/group.one-authdns/-/blob/main/octodns/wp-rocket.me.yaml?ref_type=heads
         text += "https://b.rucss.wp-rocket.me\n"
