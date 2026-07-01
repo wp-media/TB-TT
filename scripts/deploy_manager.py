@@ -49,17 +49,43 @@ import argparse
 import json
 import os
 import sys
-from pathlib import Path
 
 import requests
 
 GODP_DEPLOY_URL = "https://godp.wp-media.me/v1/deploy"
-APPS_CONFIG_PATH = Path(__file__).parent.parent / "config" / "apps.json"
 
-
-def load_apps_config():
-    with open(APPS_CONFIG_PATH, encoding="utf-8") as f:
-        return json.load(f)
+APPS_CONFIG = {
+    "appList": {
+        "Imagify App":          "wpm-imagify-app",
+        "SaaS RUCSS":           "wpm-rucss",
+        "SaaS Director":        "wpm-saas-director",
+        "Monies":               "wpm-monies",
+        "RocketCDN App":        "wpm-rocketcdn-app",
+        "wp-rocket.me":         "wpm-wprocket",
+        "Imagify Website":      "wpm-imagify-website",
+        "RocketCDN Website":    "wpm-rocketcdn-website",
+        "BackWPup Website":     "wpm-backwpup-website",
+        "Task AI":              "wpm-task-ai",
+        "wp-media.me":          "wpm-wpmediame",
+        "RUCSS Backend":        "wpm-rucss-backend",
+        "Licenses App":         "wpm-licenses-app",
+        "Rocket Radar":         "rocket-radar",
+        "WP Media Hub":         "wp-media-hub",
+        "WordPress AI Builder": "wp-ai-builder",
+    },
+    "envList": {
+        "staging":  "staging",
+        "next":     "next",
+        "test":     "test",
+        "test1":    "test1",
+        "mirror":   "mirror",
+        "sandbox 1": "sandbox1",
+        "sandbox 2": "sandbox2",
+        "sandbox 3": "sandbox3",
+        "sandbox 4": "sandbox4",
+        "sandbox 5": "sandbox5",
+    },
+}
 
 
 def pick_from_list(label, options: dict) -> str:
@@ -120,9 +146,8 @@ def main():
     parser.add_argument("--token", help="GODP auth token (overrides TBTT_GODP_AUTH_TOKEN env var)")
     args = parser.parse_args()
 
-    config = load_apps_config()
-    app_list = config["appList"]
-    env_list = config["envList"]
+    app_list = APPS_CONFIG["appList"]
+    env_list = APPS_CONFIG["envList"]
 
     app = args.app
     if not app:
