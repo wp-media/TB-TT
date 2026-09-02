@@ -15,7 +15,8 @@
 	    "Licenses App": "wpm-licenses-app",
         "Rocket Radar": "rocket-radar",
 		"WP Media Hub": "wp-media-hub",
-        "WordPress AI Builder": "wp-ai-builder"
+        "WordPress AI Builder": "wp-ai-builder",
+        "Fleet": "wpm-fleet"
     },
     "envList": {
         "staging": "staging",
