@@ -1,0 +1,36 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: tbtt-site-health-check
+  labels:
+    app: tbtt
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: tbtt-site-health-check
+              image: curlimages/curl:8.10.1
+              env:
+                - name: TBTT_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: tbtt-secrets
+                      key: TBTT_API_KEY
+              # Test sites are listed in config/wp-test-sites.json; add a slug here when a new one is provisioned.
+              command:
+                - sh
+                - -c
+                - |
+                  set -e
+                  for site in one-com; do
+                    echo "Checking site: $site"
+                    curl --fail -X POST \
+                      -H "X-Api-Key: $TBTT_API_KEY" \
+                      "http://tbtt-service:3000/site-monitor/check/$site"
+                  done
