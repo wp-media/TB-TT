@@ -125,6 +125,57 @@ Returns a machine-readable list of all IPv6 addresses used by WP Rocket services
 
 ---
 
+## Site Monitoring
+
+TB-TT monitors a set of WordPress test sites (one per hosting provider, e.g. one.com, Hostinger, WP Engine), each running the full plugin suite (WP Rocket, Imagify, BackWPUp, RankMath, etc.). A k8s CronJob calls TB-TT hourly per site; TB-TT runs health checks and a pending-updates check, then posts a summary to the `#wpmedia_auto-e2e-reports` Slack channel.
+
+### Base URL
+
+The site monitoring endpoint is prefixed with `/site-monitor`.
+
+#### Check a site
+
+**Endpoint:** `/site-monitor/check/<site_slug>`
+
+**Method:** `POST`
+
+**Authentication:** Required — `X-Api-Key` header, matching the `TBTT_API_KEY` app secret
+
+**Response:** `202 {}` immediately. The checks run in a background thread; the actual result is posted to Slack (channel `auto-e2e-reports`), not returned in the HTTP response. `404` if `site_slug` is not a known site (see `config/wp-test-sites.json`), `401` if the API key is missing or wrong.
+
+**Checks performed** (see `sources/factories/WordPressSiteFactory.py`):
+
+- `homepage (cached)` and `homepage (uncached)` — homepage reachability, with the uncached variant bypassing WP Rocket's page cache via `?nowprocket` plus a cache-busting query param
+- `login page` — `wp-login.php` reachability
+- `REST API` — anonymous `GET /wp-json/` reachability
+- `wp-admin (authenticated)` — authenticated `GET /wp-json/wp/v2/users/me` using the site's application password, exercising the full authenticated bootstrap (not just anonymous reachability)
+- `pending updates` — calls the TB-TT Site Monitor WordPress plugin's `GET /wp-json/tbtt-monitor/v1/updates-pending` route to check for pending core/plugin/theme updates
+
+Each check reports a `status` of `ok`, `warning`, or `fail`. Reachability check failures are always `fail`. A pending update is only ever a `warning` — WordPress's own auto-updates are expected to apply it in due course, and flagging it as a hard failure would raise false alarms (e.g. right after a site switches to WordPress Beta Tester's nightly core channel, there is almost always something "pending" between hourly runs). Only a broken call to the pending-updates route itself (e.g. the plugin got deactivated, so its REST route 404s) is a `fail`.
+
+### Adding a new test site to the monitoring list
+
+1. **Provision the WordPress site** on the target host, install the full plugin suite, and note its URL.
+2. **Install the TB-TT Site Monitor plugin** (`wordpress-assets/tbtt-site-monitor/tbtt-site-monitor.php` in this repo) as a regular plugin on the site (`wp-content/plugins/tbtt-site-monitor/`) and activate it. It forces WP Rocket auto-updates on and exposes the pending-updates REST route.
+3. **Install and activate the "WordPress Beta Tester" plugin** (`wordpress-beta-tester`) so the site tracks WordPress core's nightly channel — the TB-TT Site Monitor plugin selects the channel automatically once Beta Tester is active.
+4. **Set `WP_AUTO_UPDATE_CORE = true`** in the site's `wp-config.php` so nightly core builds actually auto-apply unattended (Beta Tester only makes them available; this constant is what makes WordPress apply them on its own).
+5. **Create an Application Password** for an admin user on the site (Users → Profile → Application Passwords in wp-admin).
+6. **Add the hostname to the TB-TT k8s egress allowlist**: TB-TT's pods only have outbound network access to hosts explicitly allowed through the firewall. Order an egress rule for the new site's hostname via [chef-self-service.one.com/order/chef-repo/k8s-add-firewall-egress.rb](https://chef-self-service.one.com/order/chef-repo/k8s-add-firewall-egress.rb/) — without this, TB-TT's requests to the site will time out or be blocked even though everything else is configured correctly.
+7. **Add the site to `config/wp-test-sites.json`**, following the existing entries:
+   ```json
+   "my-new-host": {
+       "label": "My New Host",
+       "url": "https://my-test-site.example.com",
+       "app_user": "the-wp-admin-username",
+       "app_password_env": "TBTT_SITE_MY_NEW_HOST_APP_PASSWORD"
+   }
+   ```
+8. **Add the application password as a new secret**, `TBTT_SITE_MY_NEW_HOST_APP_PASSWORD` (matching `app_password_env` above), to the `tbtt-secrets` k8s secret used by the TB-TT deployment.
+9. **Add the new site slug to the k8s CronJob** that triggers `/site-monitor/check/<site_slug>` hourly (the CronJob manifest is managed outside this repo) so the new site gets checked on the same schedule as the others.
+10. **Verify**: `curl -X POST -H "X-Api-Key: <TBTT_API_KEY>" https://<tbtt-host>/site-monitor/check/my-new-host` and confirm a summary for the new site shows up in `#wpmedia_auto-e2e-reports`.
+
+---
+
 ## Slack Commands
 
 ### `/wprocket-ips` Command
