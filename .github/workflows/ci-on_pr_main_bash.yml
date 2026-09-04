@@ -17,6 +17,7 @@ env:
   TBTT_GITHUB_WEBHOOK_SECRET: tbtt_github_webhook_secret
   TBTT_GODP_AUTH_TOKEN: d
   TBTT_NOTION_API_KEY: e
+  TBTT_API_KEY: f
 
 jobs:
   lint:

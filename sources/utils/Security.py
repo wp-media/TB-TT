@@ -25,3 +25,15 @@ def validate_github_webhook_signature(payload, secret):
 
     # See if they match
     return hmac.compare_digest(local_signature.hexdigest(), github_signature)
+
+
+def validate_api_key(payload, expected_api_key):
+    """
+        Verification of the shared API key sent by internal callers (e.g. k8s CronJobs) in the
+        X-Api-Key header, using a constant-time comparison.
+    """
+    provided_api_key = payload.headers.get('X-Api-Key')
+    if not provided_api_key:
+        return False
+
+    return hmac.compare_digest(provided_api_key, expected_api_key)
