@@ -111,6 +111,8 @@ class SlackMessageFactory(SlackFactoryAbstract):
             return self.slack_config["ops-channel"]
         if 'ops-deploy' == flow:
             return self.slack_config["ops-deploy-channel"]
+        if 'auto-e2e-reports' == flow:
+            return self.slack_config["auto-e2e-reports-channel"]
         raise ValueError('Unknown flow for get_channel.')
 
     def get_release_note_review_blocks(self, text):

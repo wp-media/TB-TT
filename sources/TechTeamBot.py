@@ -10,6 +10,7 @@ from sources.listeners.SlackInteractionListener import SlackInteractionListener
 from sources.listeners.SlackCommandListener import SlackCommandListener
 from sources.listeners.GithubWebhookListener import GithubWebhookListener
 from sources.listeners.SupportListener import SupportListener
+from sources.listeners.SiteMonitorListener import SiteMonitorListener
 import sources.utils.Constants as cst
 
 
@@ -45,6 +46,7 @@ class TechTeamBot(FlaskAppWrapper):
         self.__load_key("TBTT_GITHUB_WEBHOOK_SECRET", cst.APP_CONFIG_TOKEN_GITHUB_WEBHOOK_SECRET)
         self.__load_key("TBTT_GODP_AUTH_TOKEN", cst.APP_CONFIG_TOKEN_GODP_AUTH_TOKEN)
         self.__load_key("TBTT_NOTION_API_KEY", cst.APP_CONFIG_TOKEN_NOTION_API_KEY)
+        self.__load_key("TBTT_API_KEY", cst.APP_CONFIG_TOKEN_API_KEY)
 
     def __setup_slack_interaction_endpoint(self):
         """
@@ -80,6 +82,14 @@ class TechTeamBot(FlaskAppWrapper):
         self.add_endpoint("/support/wprocket-ips/ipv6", endpoint_name='support_wprocket_ipv6',
                           handler=support_listener.get_wprocket_ipv6_machine_readable, methods=['GET'])
 
+    def __setup_site_monitor_endpoints(self):
+        """
+            Creates the endpoint used by the k8s CronJob to monitor WP test sites
+        """
+        site_monitor_listener = SiteMonitorListener()
+        self.add_endpoint("/site-monitor/check/<site_slug>", endpoint_name='site_monitor_check',
+                          handler=site_monitor_listener.check_site, methods=['POST'])
+
     def __load_config(self):
         with open(Path(__file__).parent.parent / "config" / "app.json", encoding='utf-8') as file_app_config:
             self.__app_config = json.load(file_app_config)
@@ -94,6 +104,7 @@ class TechTeamBot(FlaskAppWrapper):
         self.__setup_slack_command_endpoint()
         self.__setup_github_webhook_endpoint()
         self.__setup_support_enpoints()
+        self.__setup_site_monitor_endpoints()
 
     def run(self, **kwargs):
         self.app.run(port=self.__app_config['port'], **kwargs)

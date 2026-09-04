@@ -10,7 +10,7 @@ externalDocs:
   description: Notion Documentation
   url: https://www.notion.so/wpmedia/TB-TT-137d921c1ff947c4a19e9d0a83262e6a?pvs=4
 servers:
-  - url: https://wpm-tbtt.public-default.live1-k8s-cph3.one.com
+  - url: https://wpm-tbtt.public-default.k8spod1-cph3.ingress.k8s.g1i.one
 tags:
   - name: support
     description: Automation for the support team

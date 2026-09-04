@@ -3,5 +3,6 @@
     "engineering-service-team-channel": "C08EFCVF459",
     "release-channel" : "C08DVJF5ZT6",
     "ops-channel": "C08DVHYK6A0",
-    "ops-deploy-channel": "C08DQANUTNZ"
+    "ops-deploy-channel": "C08DQANUTNZ",
+    "auto-e2e-reports-channel": "C0925D6CBPF"
 }
