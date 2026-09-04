@@ -1,17 +1,17 @@
 <?php
 /**
  * Plugin Name: TB-TT Site Monitor
- * Description: Forces WP Rocket auto-updates, opts core into the nightly channel via WordPress Beta Tester,
- *              and exposes a REST route reporting pending-update state for TB-TT's health monitoring.
- * Version: 1.0.0
+ * Description: Forces WP Rocket auto-updates and exposes a REST route reporting pending-update
+ *              state for TB-TT's health monitoring.
+ * Version: 1.1.0
  * Author: WP Media
  * License: GPL-2.0-or-later
  *
  * Install as a regular plugin (wp-content/plugins/tbtt-site-monitor/) and activate it on each TB-TT test site.
  *
- * Requires the "WordPress Beta Tester" plugin (slug: wordpress-beta-tester) to be installed and active,
- * and WP_AUTO_UPDATE_CORE set to true in wp-config.php so nightly core builds actually auto-apply
- * (this plugin only selects the channel; WP_AUTO_UPDATE_CORE is what makes updates unattended).
+ * Core update channel (nightly/beta/point release) is set manually per site via the "WordPress Beta
+ * Tester" plugin (slug: wordpress-beta-tester) — this plugin no longer forces it. WP_AUTO_UPDATE_CORE
+ * must still be set to true in wp-config.php so core updates actually auto-apply unattended.
  *
  * Unlike a must-use plugin, this one can be deactivated from wp-admin. If that happens, the REST
  * route below stops responding (404), which TB-TT's health check already reports as a failure.
@@ -34,19 +34,6 @@ add_filter(
 	},
 	10,
 	2
-);
-
-add_action(
-	'init',
-	function () {
-		update_site_option(
-			'wp_beta_tester',
-			array(
-				'channel'       => 'development',
-				'stream-option' => '',
-			)
-		);
-	}
 );
 
 add_action(
