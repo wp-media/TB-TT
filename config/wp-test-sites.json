@@ -5,6 +5,12 @@
             "url": "https://wpmedia-do-not-delete.wpin6.1prod.one",
             "app_user": "mathieu.lamiot@group.one",
             "app_password_env": "TBTT_SITE_ONE_COM_APP_PASSWORD"
+        },
+        "wpengine": {
+            "label": "WP Engine",
+            "url": "https://wprocketyo.wpengine.com",
+            "app_user": "mathieu.lamiot@group.one",
+            "app_password_env": "TBTT_SITE_WPENGINE_APP_PASSWORD"
         }
     }
 }
