@@ -127,7 +127,7 @@ Returns a machine-readable list of all IPv6 addresses used by WP Rocket services
 
 ## Site Monitoring
 
-TB-TT monitors a set of WordPress test sites (one per hosting provider, e.g. one.com, Hostinger, WP Engine), each running the full plugin suite (WP Rocket, Imagify, BackWPUp, RankMath, etc.). A k8s CronJob calls TB-TT hourly per site; TB-TT runs health checks and a pending-updates check, then posts a summary to the `#wpmedia_auto-e2e-reports` Slack channel.
+TB-TT monitors a set of WordPress test sites (one per hosting provider: one.com, WP Engine, SiteGround, OVH), each running the full plugin suite (WP Rocket, Imagify, BackWPUp, RankMath, etc.). A k8s CronJob calls TB-TT once a day (09:00 UTC) for each site in turn; TB-TT runs health checks and a pending-updates check, then posts a summary to the `#wpmedia_auto-e2e-reports` Slack channel.
 
 ### Base URL
 
@@ -151,7 +151,20 @@ The site monitoring endpoint is prefixed with `/site-monitor`.
 - `wp-admin (authenticated)` — authenticated `GET /wp-json/wp/v2/users/me` using the site's application password, exercising the full authenticated bootstrap (not just anonymous reachability)
 - `pending updates` — calls the TB-TT Site Monitor WordPress plugin's `GET /wp-json/tbtt-monitor/v1/updates-pending` route to check for pending core/plugin/theme updates
 
-Each check reports a `status` of `ok`, `warning`, or `fail`. Reachability check failures are always `fail`. A pending update is only ever a `warning` — WordPress's own auto-updates are expected to apply it in due course, and flagging it as a hard failure would raise false alarms (e.g. right after a site picks up a new core build on WordPress Beta Tester's nightly channel, there is almost always something "pending" between hourly runs). Only a broken call to the pending-updates route itself (e.g. the plugin got deactivated, so its REST route 404s) is a `fail`.
+Each check reports a `status` of `ok`, `warning`, or `fail`. Reachability check failures are always `fail`. A pending update is only ever a `warning` — WordPress's own auto-updates are expected to apply it in due course, and flagging it as a hard failure would raise false alarms (e.g. right after a site picks up a new core build on WordPress Beta Tester's nightly channel, there is almost always something "pending" between runs). Only a broken call to the pending-updates route itself (e.g. the plugin got deactivated, so its REST route 404s) is a `fail`.
+
+When the `homepage (cached)` check fails, the remaining checks are skipped and reported as a single `other checks` line: they would all fail for the same underlying reason, and six identical failures make it harder to see which check is the real problem.
+
+#### Host bot protection
+
+The monitor sends a descriptive `User-Agent` (`TB-TT-Site-Monitor/...`, see `sources/factories/WordPressSiteFactory.py`) rather than the `requests` default. This is load-bearing, and the constraints pull in opposite directions:
+
+- **WP Engine's firewall rejects the default `python-requests/x.y.z` User-Agent** with a `403` on every URL, including the homepage — which looks exactly like a site outage. A descriptive User-Agent is accepted, so no Web Rules change or support ticket is needed.
+- **SiteGround's bot protection rejects User-Agents containing `Chrome/`** with a `403`. So the monitor must *not* impersonate a browser to work around the point above.
+
+SiteGround additionally serves an IP-based CAPTCHA challenge to the cluster's egress IP, as an HTTP **`202`** carrying an `SG-Captcha: challenge` header (note `202` is also what this endpoint itself returns, which makes the two easy to confuse in a report). A User-Agent change does not clear it — it needs TB-TT's egress IP allowlisted in SiteGround's Site Tools. Failure details call this out as a `bot-protection challenge`.
+
+Failure details also flag a response that `did not come from WordPress` — an HTML error page served by the web server before WordPress ran, which points at rewrite rules (`.htaccess` / `mod_rewrite`) rather than at a missing REST route.
 
 ### Adding a new test site to the monitoring list
 
@@ -171,8 +184,9 @@ Each check reports a `status` of `ok`, `warning`, or `fail`. Reachability check 
    }
    ```
 8. **Add the application password as a new secret**, `TBTT_SITE_MY_NEW_HOST_APP_PASSWORD` (matching `app_password_env` above), to the `tbtt-secrets` k8s secret used by the TB-TT deployment.
-9. **Add the new site slug to the k8s CronJob** that triggers `/site-monitor/check/<site_slug>` hourly (the CronJob manifest is managed outside this repo) so the new site gets checked on the same schedule as the others.
-10. **Verify**: `curl -X POST -H "X-Api-Key: <TBTT_API_KEY>" https://<tbtt-host>/site-monitor/check/my-new-host` and confirm a summary for the new site shows up in `#wpmedia_auto-e2e-reports`.
+9. **Add the new site slug to the k8s CronJob** that triggers `/site-monitor/check/<site_slug>` daily (the CronJob manifest lives in the `tbtt-deploy` repo, `kubernetes/production/cronjob-wp-site-healthcheck.yaml`, in a hardcoded `for site in ...` loop) so the new site gets checked on the same schedule as the others.
+10. **Check whether the host blocks the monitor.** Some hosts challenge or block non-browser traffic — see [Host bot protection](#host-bot-protection) above. If checks fail with a `403`, a `202` bot-protection challenge, or a response that "did not come from WordPress", allowlist TB-TT's egress IP in the host's control panel before assuming the site is broken.
+11. **Verify**: `curl -X POST -H "X-Api-Key: <TBTT_API_KEY>" https://<tbtt-host>/site-monitor/check/my-new-host` and confirm a summary for the new site shows up in `#wpmedia_auto-e2e-reports`.
 
 ---
 
