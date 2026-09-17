@@ -5,15 +5,8 @@ import time
 import requests
 
 # Hosts running bot protection (e.g. WP Engine's firewall) reject the default 'python-requests/x.y.z'
-# User-Agent outright, which made every check fail with a 403 that looked like a site outage. A
-# descriptive User-Agent identifies the monitor and is accepted by the monitored hosts. Note it must
-# NOT impersonate a browser either: some hosts' bot protection rejects browser-like User-Agents from
-# server-side clients, so an honest, descriptive one is the only thing that satisfies both.
 USER_AGENT = 'TB-TT-Site-Monitor/1.0 (+https://github.com/wp-media/TB-TT)'
 
-# Connect timeout is kept short (a host that does not accept a connection quickly is down), while the
-# read timeout is generous: a cache-busted homepage on a slow host legitimately takes several seconds,
-# and a tighter budget reported false failures.
 CONNECT_TIMEOUT = 5
 READ_TIMEOUT = 30
 

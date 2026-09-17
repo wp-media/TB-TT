@@ -129,8 +129,6 @@ Returns a machine-readable list of all IPv6 addresses used by WP Rocket services
 
 TB-TT monitors a set of WordPress test sites (one per hosting provider: one.com, WP Engine, OVH), each running the full plugin suite (WP Rocket, Imagify, BackWPUp, RankMath, etc.). A k8s CronJob calls TB-TT once a day (09:00 UTC) for each site in turn; TB-TT runs health checks and a pending-updates check, then posts a summary to the `#wpmedia_auto-e2e-reports` Slack channel.
 
-> **A monitored host must not challenge or block server-to-server traffic.** A SiteGround test site was monitored until it was removed, because it could never be checked: SiteGround's Anti-Bot AI served an IP-based JavaScript CAPTCHA challenge (HTTP `202` with a CAPTCHA-challenge header) to TB-TT's egress IP on *every* path and method. It cannot be worked around from this side — not by the User-Agent, not by authenticating, not by reusing a session — because it is applied at the host's edge before WordPress runs. Exempting it requires a per-customer SiteGround support request, as there is no self-service control (Site Tools → Security → Blocked Traffic does not govern the Anti-Bot AI). Check for this class of block when onboarding a new host, and see step 10 of the runbook below.
-
 ### Base URL
 
 The site monitoring endpoint is prefixed with `/site-monitor`.
