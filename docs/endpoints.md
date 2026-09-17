@@ -127,7 +127,9 @@ Returns a machine-readable list of all IPv6 addresses used by WP Rocket services
 
 ## Site Monitoring
 
-TB-TT monitors a set of WordPress test sites (one per hosting provider: one.com, WP Engine, SiteGround, OVH), each running the full plugin suite (WP Rocket, Imagify, BackWPUp, RankMath, etc.). A k8s CronJob calls TB-TT once a day (09:00 UTC) for each site in turn; TB-TT runs health checks and a pending-updates check, then posts a summary to the `#wpmedia_auto-e2e-reports` Slack channel.
+TB-TT monitors a set of WordPress test sites (one per hosting provider: one.com, WP Engine, OVH), each running the full plugin suite (WP Rocket, Imagify, BackWPUp, RankMath, etc.). A k8s CronJob calls TB-TT once a day (09:00 UTC) for each site in turn; TB-TT runs health checks and a pending-updates check, then posts a summary to the `#wpmedia_auto-e2e-reports` Slack channel.
+
+> **A monitored host must not challenge or block server-to-server traffic.** A SiteGround test site was monitored until it was removed, because it could never be checked: SiteGround's Anti-Bot AI served an IP-based JavaScript CAPTCHA challenge (HTTP `202` with a CAPTCHA-challenge header) to TB-TT's egress IP on *every* path and method. It cannot be worked around from this side — not by the User-Agent, not by authenticating, not by reusing a session — because it is applied at the host's edge before WordPress runs. Exempting it requires a per-customer SiteGround support request, as there is no self-service control (Site Tools → Security → Blocked Traffic does not govern the Anti-Bot AI). Check for this class of block when onboarding a new host, and see step 10 of the runbook below.
 
 ### Base URL
 
@@ -157,14 +159,11 @@ When the `homepage (cached)` check fails, the remaining checks are skipped and r
 
 #### Host bot protection
 
-The monitor sends a descriptive `User-Agent` (`TB-TT-Site-Monitor/...`, see `sources/factories/WordPressSiteFactory.py`) rather than the `requests` default. This is load-bearing, and the constraints pull in opposite directions:
+The monitor sends a descriptive `User-Agent` (`TB-TT-Site-Monitor/...`, see `sources/factories/WordPressSiteFactory.py`) rather than the `requests` default. This is load-bearing: **WP Engine's firewall rejects the default `python-requests/x.y.z` User-Agent** with a `403` on every URL, including the homepage — which looks exactly like a site outage. A descriptive User-Agent is accepted, so no Web Rules change or support ticket is needed.
 
-- **WP Engine's firewall rejects the default `python-requests/x.y.z` User-Agent** with a `403` on every URL, including the homepage — which looks exactly like a site outage. A descriptive User-Agent is accepted, so no Web Rules change or support ticket is needed.
-- **SiteGround's bot protection rejects User-Agents containing `Chrome/`** with a `403`. So the monitor must *not* impersonate a browser to work around the point above.
+It must not impersonate a browser either: some hosts' bot protection rejects browser-like User-Agents from server-side clients (SiteGround, since removed from the monitored list, rejected any User-Agent containing `Chrome/`). A descriptive, honest User-Agent is the only thing that satisfies both constraints — do not "fix" a `403` by pretending to be a browser.
 
-SiteGround additionally serves an IP-based CAPTCHA challenge to the cluster's egress IP, as an HTTP **`202`** carrying an `SG-Captcha: challenge` header (note `202` is also what this endpoint itself returns, which makes the two easy to confuse in a report). A User-Agent change does not clear it — it needs TB-TT's egress IP allowlisted in SiteGround's Site Tools. Failure details call this out as a `bot-protection challenge`.
-
-Failure details also flag a response that `did not come from WordPress` — an HTML error page served by the web server before WordPress ran, which points at rewrite rules (`.htaccess` / `mod_rewrite`) rather than at a missing REST route.
+Failure details flag a response that `did not come from WordPress` — an HTML error page served by the web server before WordPress ran, which points at rewrite rules (`.htaccess` / `mod_rewrite`) rather than at a missing REST route.
 
 ### Adding a new test site to the monitoring list
 
@@ -185,7 +184,7 @@ Failure details also flag a response that `did not come from WordPress` — an H
    ```
 8. **Add the application password as a new secret**, `TBTT_SITE_MY_NEW_HOST_APP_PASSWORD` (matching `app_password_env` above), to the `tbtt-secrets` k8s secret used by the TB-TT deployment.
 9. **Add the new site slug to the k8s CronJob** that triggers `/site-monitor/check/<site_slug>` daily (the CronJob manifest lives in the `tbtt-deploy` repo, `kubernetes/production/cronjob-wp-site-healthcheck.yaml`, in a hardcoded `for site in ...` loop) so the new site gets checked on the same schedule as the others.
-10. **Check whether the host blocks the monitor.** Some hosts challenge or block non-browser traffic — see [Host bot protection](#host-bot-protection) above. If checks fail with a `403`, a `202` bot-protection challenge, or a response that "did not come from WordPress", allowlist TB-TT's egress IP in the host's control panel before assuming the site is broken.
+10. **Check that the host does not block server-to-server traffic.** Before relying on a new host, confirm a plain `GET` of its homepage and `/wp-json/` from a non-browser client returns `200` — see [Host bot protection](#host-bot-protection) above. Some hosts challenge or block automated traffic outright — a `403`, or a `202` carrying a CAPTCHA-challenge header — which makes every check fail in a way that looks like a site outage. If the host offers an exemption, allowlist TB-TT's egress IP in its control panel; if it does not, the host is not a viable monitoring target (see the note at the top of this section).
 11. **Verify**: `curl -X POST -H "X-Api-Key: <TBTT_API_KEY>" https://<tbtt-host>/site-monitor/check/my-new-host` and confirm a summary for the new site shows up in `#wpmedia_auto-e2e-reports`.
 
 ---

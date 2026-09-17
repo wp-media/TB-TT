@@ -7,7 +7,8 @@ import requests
 # Hosts running bot protection (e.g. WP Engine's firewall) reject the default 'python-requests/x.y.z'
 # User-Agent outright, which made every check fail with a 403 that looked like a site outage. A
 # descriptive User-Agent identifies the monitor and is accepted by the monitored hosts. Note it must
-# NOT impersonate a browser: SiteGround's bot protection rejects User-Agents containing 'Chrome/'.
+# NOT impersonate a browser either: some hosts' bot protection rejects browser-like User-Agents from
+# server-side clients, so an honest, descriptive one is the only thing that satisfies both.
 USER_AGENT = 'TB-TT-Site-Monitor/1.0 (+https://github.com/wp-media/TB-TT)'
 
 # Connect timeout is kept short (a host that does not accept a connection quickly is down), while the
@@ -31,20 +32,15 @@ class WordPressSiteFactory():
     def __failure_detail(self, response):
         """
             Builds the 'detail' of a failed check, adding the hints needed to tell apart the failure
-            modes that a bare status code makes indistinguishable: a challenge or block served by the
-            host's edge, a 404 served by the web server rather than by WordPress, a redirect to
-            somewhere unexpected, and an authentication problem caused by missing credentials.
+            modes that a bare status code makes indistinguishable: a 404 served by the web server
+            rather than by WordPress, a redirect to somewhere unexpected, and an authentication
+            problem caused by missing credentials.
         """
         hints = []
 
         server = response.headers.get('Server')
         if server:
             hints.append(f'server: {server}')
-
-        # A bot-protection challenge (e.g. SiteGround's 'SG-Captcha: challenge', served as a 202) is a
-        # block on the monitor, not a site outage, and needs an IP allowlist rather than a site fix.
-        if response.headers.get('SG-Captcha'):
-            hints.append('bot-protection challenge')
 
         # An HTML 404 without WordPress's own markup means the web server answered before WordPress did,
         # which points at rewrite rules (.htaccess / mod_rewrite) rather than at a missing route.

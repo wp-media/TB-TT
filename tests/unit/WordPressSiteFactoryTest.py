@@ -47,23 +47,6 @@ def mock_error_response(*args, **kwargs):
     return RequestReturn()
 
 
-def mock_captcha_challenge_response(*args, **kwargs):
-    """
-    Mocks the 202 bot-protection challenge SiteGround serves to the monitor
-    """
-    class RequestReturn:
-        """
-        Mocks the return of requests.get
-        """
-        status_code = 202
-        headers = {'Server': 'nginx', 'SG-Captcha': 'challenge', 'Content-Type': 'text/html'}
-        text = '<html><head><meta http-equiv="refresh" content="0;/.well-known/sgcaptcha/"></head></html>'
-        history = []
-        url = 'https://example.test/'
-
-    return RequestReturn()
-
-
 def mock_server_404_response(*args, **kwargs):
     """
     Mocks the bare Apache 404 served when rewrite rules are not applied, so WordPress never runs
@@ -135,20 +118,6 @@ def test_check_health_skips_remaining_checks_when_homepage_fails(mock_requests):
     assert mock_requests.call_count == 1
 
 
-@patch("sources.factories.WordPressSiteFactory.requests.get", side_effect=mock_captcha_challenge_response)
-def test_check_health_reports_bot_protection_challenge(mock_requests):
-    """
-    Tests a bot-protection challenge (SiteGround serves one as a 202) is called out as such, so it is
-    not mistaken for a site outage: it needs an IP allowlist on the host, not a fix on the site.
-    """
-    factory = WordPressSiteFactory()
-    results = factory.check_health(SITE)
-
-    detail = results['homepage (cached)']['detail']
-    assert 'Status code 202' in detail
-    assert 'bot-protection challenge' in detail
-
-
 @patch("sources.factories.WordPressSiteFactory.requests.get", side_effect=mock_server_404_response)
 def test_check_health_reports_non_wordpress_response(mock_requests):
     """
@@ -167,7 +136,8 @@ def test_check_health_reports_non_wordpress_response(mock_requests):
 def test_check_health_sends_a_descriptive_user_agent(mock_requests):
     """
     Tests every request identifies the monitor with a descriptive, non-browser User-Agent: the default
-    'python-requests' one is rejected by WP Engine's firewall, and a 'Chrome/' one by SiteGround's.
+    'python-requests' one is rejected by WP Engine's firewall, and some hosts' bot protection rejects
+    browser-like ones from server-side clients, so the monitor must impersonate neither.
     """
     factory = WordPressSiteFactory()
     factory.check_health(SITE)
