@@ -127,7 +127,9 @@ Returns a machine-readable list of all IPv6 addresses used by WP Rocket services
 
 ## Site Monitoring
 
-TB-TT monitors a set of WordPress test sites (one per hosting provider, e.g. one.com, Hostinger, WP Engine), each running the full plugin suite (WP Rocket, Imagify, BackWPUp, RankMath, etc.). A k8s CronJob calls TB-TT hourly per site; TB-TT runs health checks and a pending-updates check, then posts a summary to the `#wpmedia_auto-e2e-reports` Slack channel.
+TB-TT monitors a set of WordPress test sites (one per hosting provider: one.com, WP Engine, OVH), each running the full plugin suite (WP Rocket, Imagify, BackWPUp, RankMath, etc.). A k8s CronJob calls TB-TT once a day (09:00 UTC) for each site in turn; TB-TT runs health checks and a pending-updates check, then posts a summary to the `#wpmedia_auto-e2e-reports` Slack channel.
+
+> **A monitored host must not challenge or block server-to-server traffic.** A SiteGround test site was monitored until it was removed, because it could never be checked: SiteGround's Anti-Bot AI served an IP-based JavaScript CAPTCHA challenge (HTTP `202` with an `SG-Captcha: challenge` header) to TB-TT's egress IP on *every* path and method. It cannot be worked around from this side — not by the User-Agent, not by authenticating, not by reusing a session — because it is applied at the host's edge before WordPress runs. Exempting it requires a per-customer SiteGround support request, as there is no self-service control (Site Tools → Security → Blocked Traffic does not govern the Anti-Bot AI). Check for this class of block when onboarding a new host, and see step 10 of the runbook below.
 
 ### Base URL
 
@@ -151,7 +153,7 @@ The site monitoring endpoint is prefixed with `/site-monitor`.
 - `wp-admin (authenticated)` — authenticated `GET /wp-json/wp/v2/users/me` using the site's application password, exercising the full authenticated bootstrap (not just anonymous reachability)
 - `pending updates` — calls the TB-TT Site Monitor WordPress plugin's `GET /wp-json/tbtt-monitor/v1/updates-pending` route to check for pending core/plugin/theme updates
 
-Each check reports a `status` of `ok`, `warning`, or `fail`. Reachability check failures are always `fail`. A pending update is only ever a `warning` — WordPress's own auto-updates are expected to apply it in due course, and flagging it as a hard failure would raise false alarms (e.g. right after a site picks up a new core build on WordPress Beta Tester's nightly channel, there is almost always something "pending" between hourly runs). Only a broken call to the pending-updates route itself (e.g. the plugin got deactivated, so its REST route 404s) is a `fail`.
+Each check reports a `status` of `ok`, `warning`, or `fail`. Reachability check failures are always `fail`. A pending update is only ever a `warning` — WordPress's own auto-updates are expected to apply it in due course, and flagging it as a hard failure would raise false alarms (e.g. right after a site picks up a new core build on WordPress Beta Tester's nightly channel, there is almost always something "pending" between runs). Only a broken call to the pending-updates route itself (e.g. the plugin got deactivated, so its REST route 404s) is a `fail`.
 
 ### Adding a new test site to the monitoring list
 
@@ -171,8 +173,9 @@ Each check reports a `status` of `ok`, `warning`, or `fail`. Reachability check 
    }
    ```
 8. **Add the application password as a new secret**, `TBTT_SITE_MY_NEW_HOST_APP_PASSWORD` (matching `app_password_env` above), to the `tbtt-secrets` k8s secret used by the TB-TT deployment.
-9. **Add the new site slug to the k8s CronJob** that triggers `/site-monitor/check/<site_slug>` hourly (the CronJob manifest is managed outside this repo) so the new site gets checked on the same schedule as the others.
-10. **Verify**: `curl -X POST -H "X-Api-Key: <TBTT_API_KEY>" https://<tbtt-host>/site-monitor/check/my-new-host` and confirm a summary for the new site shows up in `#wpmedia_auto-e2e-reports`.
+9. **Add the new site slug to the k8s CronJob** that triggers `/site-monitor/check/<site_slug>` daily (the CronJob manifest lives in the `tbtt-deploy` repo, `kubernetes/production/cronjob-wp-site-healthcheck.yaml`, in a hardcoded `for site in ...` loop) so the new site gets checked on the same schedule as the others.
+10. **Check that the host does not block server-to-server traffic.** Before relying on a new host, confirm a plain `GET` of its homepage and `/wp-json/` from a non-browser client returns `200`. Some hosts challenge or block automated traffic outright — a `403`, or a `202` carrying a CAPTCHA-challenge header — which makes every check fail in a way that looks like a site outage. If the host does this and offers no exemption, it is not a viable monitoring target (see the note at the top of this section).
+11. **Verify**: `curl -X POST -H "X-Api-Key: <TBTT_API_KEY>" https://<tbtt-host>/site-monitor/check/my-new-host` and confirm a summary for the new site shows up in `#wpmedia_auto-e2e-reports`.
 
 ---
 

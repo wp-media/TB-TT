@@ -12,12 +12,6 @@
             "app_user": "mathieu.lamiot@group.one",
             "app_password_env": "TBTT_SITE_WPENGINE_APP_PASSWORD"
         },
-        "siteground": {
-            "label": "SiteGround",
-            "url": "https://siteground-monitoring.rocketlabsqa.ovh",
-            "app_user": "mathieu.lamiot@group.one",
-            "app_password_env": "TBTT_SITE_SITEGROUND_APP_PASSWORD"
-        },
         "ovh": {
             "label": "OVH",
             "url": "https://ovh-monitoring.rocketlabsqa.ovh",
