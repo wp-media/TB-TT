@@ -16,7 +16,8 @@
         "Rocket Radar": "rocket-radar",
 		"WP Media Hub": "wpm-hub",
         "WordPress AI Builder": "wp-ai-builder",
-        "Fleet": "wpm-fleet"
+        "Fleet": "wpm-fleet",
+        "AI WordPress Configurator": "wpm-ai-wordpress-configurator"
     },
     "envList": {
         "staging": "staging",
